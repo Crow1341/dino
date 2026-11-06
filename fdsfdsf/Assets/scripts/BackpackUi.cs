@@ -28,7 +28,7 @@ public class BackpackUi : UIWindow
 
     private IEnumerator SwitchWindow(string windowName)
     {
-        UiManager.Instance.HideWindow("BackpackUi");
+        UiManager.Instance.HideWindow("BackpakcUi");
         yield return new WaitForSeconds(delay);
         UiManager.Instance.ShowWindow(windowName);
     }

@@ -13,7 +13,7 @@ public class GameplayUi : UIWindow
 
     [Header("Nombres de las ventanas")]
     [SerializeField] private string Mochila = "BackpackUi";
-    [SerializeField] private string Habilidades = "HabilitiesUi";
+    [SerializeField] private string Habilidades = "GabilitiesUi";
 
     public override void Initialize()
     {
@@ -32,9 +32,7 @@ public class GameplayUi : UIWindow
 
     private void OpenWindow(string windowName)
     {
-        Debug.Log("Intentando abrir: " + windowName);
-        UiManager.Instance.ShowWindow(windowName);
-
+       
         Debug.Log("Boton presionado. Ventana: " + windowName);
         UiManager.Instance.ShowWindow(windowName);
     }

@@ -28,7 +28,7 @@ public class GabilitiesUi : UIWindow
 
     private IEnumerator SwitchWindow(string windowName)
     {
-        UiManager.Instance.HideWindow("GabilitiesUi");
+        UiManager.Instance.HideWindow("HabilitiesUi");
         yield return new WaitForSeconds(delay);
         UiManager.Instance.ShowWindow(windowName);
     }
