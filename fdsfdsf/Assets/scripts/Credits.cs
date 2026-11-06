@@ -8,11 +8,11 @@ public class Credits : UIWindow
 {
     [Header("Botones")]
     public Button backButton;
-   
+
 
     [Header("Nombres de las ventanas")]
     [SerializeField] private string startWindow = "StartUi";
-   
+
 
     [SerializeField] private float delay = 1f;
 
@@ -21,7 +21,7 @@ public class Credits : UIWindow
         base.Initialize();
 
         backButton.onClick.AddListener(() => OpenWindow(startWindow));
-        
+
     }
 
     private void OpenWindow(string windowName)
@@ -31,24 +31,9 @@ public class Credits : UIWindow
 
     private IEnumerator SwitchWindow(string windowName)
     {
-        UiManager.Instance.HideWindow("StartUi");
+        UiManager.Instance.HideWindow("CreditsUi");
         yield return new WaitForSeconds(delay);
         UiManager.Instance.ShowWindow(windowName);
     }
 
-    #region Test Methods
-
-    [Button("Test Show")]
-    private void TestShow()
-    {
-        Show();
-    }
-
-    [Button("Test Hide")]
-    private void TestHide()
-    {
-        Hide();
-    }
-
-    #endregion
 }

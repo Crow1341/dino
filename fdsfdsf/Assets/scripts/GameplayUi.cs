@@ -12,35 +12,30 @@ public class GameplayUi : UIWindow
     public Button habilidadesButton;
 
     [Header("Nombres de las ventanas")]
-    [SerializeField] private string Mochila = "Mochila";
-    [SerializeField] private string Habilidades = "Habilidades";
+    [SerializeField] private string Mochila = "BackpackUi";
+    [SerializeField] private string Habilidades = "HabilitiesUi";
 
     public override void Initialize()
     {
         base.Initialize();
 
         if (mochilaButton != null)
-        {
             mochilaButton.onClick.AddListener(() => OpenWindow(Mochila));
-        }
         else
-        {
             Debug.LogWarning("Falta asignar el boton de Mochila.");
-        }
 
         if (habilidadesButton != null)
-        {
             habilidadesButton.onClick.AddListener(() => OpenWindow(Habilidades));
-        }
         else
-        {
             Debug.LogWarning("Falta asignar el boton de Habilidades.");
-        }
     }
 
     private void OpenWindow(string windowName)
     {
-        Debug.Log("Abriendo ventana: " + windowName);
+        Debug.Log("Intentando abrir: " + windowName);
+        UiManager.Instance.ShowWindow(windowName);
+
+        Debug.Log("Boton presionado. Ventana: " + windowName);
         UiManager.Instance.ShowWindow(windowName);
     }
 

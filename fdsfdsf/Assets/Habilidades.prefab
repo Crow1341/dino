@@ -130,7 +130,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7228204719594925811}
-  - component: {fileID: 8790958335351870514}
   m_Layer: 0
   m_Name: CanvasGroup
   m_TagString: Untagged
@@ -154,18 +153,6 @@ Transform:
   - {fileID: 5715962974709328406}
   m_Father: {fileID: 2514892958546702073}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!225 &8790958335351870514
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 325880052811102832}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &1464075597750412016
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,12 +519,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GabilitiesUi
   _id: HabilitiesUi
   _canvasRectTransform: {fileID: 2514892958546702073}
-  _canvasGroup: {fileID: 8790958335351870514}
+  _canvasGroup: {fileID: 0}
   _hideOnStart: 1
   showDuration: 0.5
   hideDuration: 0.5
   showEase: 27
   hideEase: 26
+  backButton: {fileID: 0}
+  gameplayWindow: GameplayUi
+  delay: 1
 --- !u!1 &7287236545883525572
 GameObject:
   m_ObjectHideFlags: 0
@@ -684,6 +674,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2514892958546702073}
+  - component: {fileID: 3074208206310305501}
   m_Layer: 0
   m_Name: habilidadesCanvas
   m_TagString: Untagged
@@ -711,6 +702,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &3074208206310305501
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360459333780331060}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &8550877666754260408
 GameObject:
   m_ObjectHideFlags: 0

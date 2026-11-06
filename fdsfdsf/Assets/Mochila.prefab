@@ -112,6 +112,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8391085438393770119}
+  - component: {fileID: 2125612033708667686}
   m_Layer: 0
   m_Name: mochilaCanvas
   m_TagString: Untagged
@@ -139,6 +140,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &2125612033708667686
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383789686647020898}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2397111978062254883
 GameObject:
   m_ObjectHideFlags: 0
@@ -148,7 +161,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3449302238947689144}
-  - component: {fileID: 8083377564873870652}
   m_Layer: 0
   m_Name: CanvasGroup
   m_TagString: Untagged
@@ -172,18 +184,6 @@ Transform:
   - {fileID: 2095390672916790916}
   m_Father: {fileID: 8391085438393770119}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!225 &8083377564873870652
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2397111978062254883}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &3166804822963786480
 GameObject:
   m_ObjectHideFlags: 0
@@ -491,12 +491,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BackpackUi
   _id: BackpakcUi
   _canvasRectTransform: {fileID: 8391085438393770119}
-  _canvasGroup: {fileID: 8083377564873870652}
+  _canvasGroup: {fileID: 0}
   _hideOnStart: 1
   showDuration: 0.5
   hideDuration: 0.5
   showEase: 27
   hideEase: 26
+  backButton: {fileID: 0}
+  gameplayWindow: GameplayUi
+  delay: 1
 --- !u!1 &8163280736732240841
 GameObject:
   m_ObjectHideFlags: 0
