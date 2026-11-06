@@ -22,9 +22,20 @@ public class StartUi : UIWindow
     {
         base.Initialize();
 
-        gameplayButton.onClick.AddListener(() => OpenWindow(gameplayWindow));
-        creditsButton.onClick.AddListener(() => OpenWindow(creditsWindow));
-        settingsButton.onClick.AddListener(() => OpenWindow(settingsWindow));
+        if (gameplayButton != null)
+            gameplayButton.onClick.AddListener(() => OpenWindow(gameplayWindow));
+        else
+            Debug.LogWarning("Falta asignar el boton de Gameplay.");
+
+        if (creditsButton != null)
+            creditsButton.onClick.AddListener(() => OpenWindow(creditsWindow));
+        else
+            Debug.LogWarning("Falta asignar el boton de Creditos.");
+
+        if (settingsButton != null)
+            settingsButton.onClick.AddListener(() => OpenWindow(settingsWindow));
+        else
+            Debug.LogWarning("Falta asignar el boton de Settings.");
     }
 
     private void OpenWindow(string windowName)

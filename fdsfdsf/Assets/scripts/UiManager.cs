@@ -30,15 +30,13 @@ public class UiManager : MonoBehaviour
         {
             if (window.Id == windowName)
             {
-                Debug.Log($"Showing window: {windowName}");
+                Debug.Log("Showing window: " + windowName);
                 window.Show();
-                break;
-            }
-            else
-            {
-                Debug.LogError("Window not found: " + windowName);
+                return;
             }
         }
+
+        Debug.LogError("Window not found: " + windowName);
     }
 
     public void HideWindow(string windowName)
@@ -47,18 +45,16 @@ public class UiManager : MonoBehaviour
         {
             if (window.Id == windowName)
             {
-                Debug.Log($"Hiding window: {windowName}");
+                Debug.Log("Hiding window: " + windowName);
                 window.Hide();
-                break;
-            }
-            else
-            {
-                Debug.LogError("Window not found: " + windowName);
+                return;
             }
         }
+
+        Debug.LogError("Window not found: " + windowName);
     }
 
-     public UIWindow GetWindow(string windowName)
+    public UIWindow GetWindow(string windowName)
     {
         foreach (var window in _uiWindows)
         {

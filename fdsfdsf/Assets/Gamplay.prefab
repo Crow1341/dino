@@ -35,8 +35,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -56}
-  m_SizeDelta: {x: -1963.0344, y: -1309.605}
+  m_AnchoredPosition: {x: -47, y: -36}
+  m_SizeDelta: {x: -1963.0344, y: -778.9264}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4364305768666518430
 CanvasRenderer:
@@ -88,7 +88,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3febf07db62338d44b0371162ae33599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MosnterController
-  healthMultiplierPerLoop: 1.5
+  baseMaxHealth: 1000
+  healthMultiplierPerKill: 1.1
+  monsterSprites: []
   monsterImage: {fileID: 3560762180252325493}
   monsterSpriteRenderer: {fileID: 0}
   nameText: {fileID: 1370266930022791891}
@@ -175,6 +177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimeController
   timeLimit: 300
   timerText: {fileID: 0}
+  showTimerBelowSeconds: 60
 --- !u!1 &3056541047283147616
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,6 +270,10 @@ MonoBehaviour:
   hideDuration: 0.5
   showEase: 27
   hideEase: 26
+  mochilaButton: {fileID: 8372842034322766768}
+  habilidadesButton: {fileID: 739692631041823354}
+  Mochila: Mochila
+  Habilidades: Habilidades
 --- !u!1 &3232465302461767282
 GameObject:
   m_ObjectHideFlags: 0
@@ -498,7 +505,7 @@ MonoBehaviour:
   monster: {fileID: 7401281255904251901}
   timer: {fileID: 2971366322751381196}
   damagePerClick: 1
-  ignoreClicksOverUI: 0
+  ignoreClicksOverButtons: 0
   defeatWindow: Defeat
   startOnPlay: 1
 --- !u!1 &6327844083024372968
@@ -991,7 +998,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30.4
+  m_fontSize: 20.65
   m_fontSizeBase: 37.3
   m_fontWeight: 400
   m_enableAutoSizing: 1
