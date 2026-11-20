@@ -38,6 +38,7 @@ namespace Dino.Utility.Audio
 
         private GameObject _soundsContainer;
         private List<AudioSource> _audioSources = new List<AudioSource>();
+        private Dictionary<string, AudioSource> _sourcesByName = new Dictionary<string, AudioSource>();
 
         private List<AudioData> _sfxAudioData = new List<AudioData>();
         private List<AudioData> _musicAudioData = new List<AudioData>();
@@ -83,17 +84,20 @@ namespace Dino.Utility.Audio
         
        
 
-        private AudioSource FindAudioSource(AudioClip clip)
+        private AudioSource FindAudioSource(string soundName)
         {
-            return _audioSources.Find(x => x.clip == clip);
+            return _sourcesByName.TryGetValue(soundName, out AudioSource source) ? source : null;
         }
 
         private void Initialize()
         {
             _soundsContainer = new GameObject("SoundsContainer");
             _audioSources = new List<AudioSource>();
+            _sourcesByName = new Dictionary<string, AudioSource>();
             _soundsContainer.transform.SetParent(transform);
+            if (_audioManagerData == null) { Debug.LogError("AudioManagerData is not assigned.", this); return; }
             PrepareLists();
+            PlaySound("music");
         }
 
         
@@ -109,11 +113,13 @@ namespace Dino.Utility.Audio
             switch (audioType)
             {
                 case AudioType.Music:
+                    audioSource.outputAudioMixerGroup = _audioManagerData.MusicAudioMixerGroup;
                     break;
                 case AudioType.SFX:
                     audioSource.outputAudioMixerGroup = _audioManagerData.SfxAudioMixerGroup;
                     break;
                 case AudioType.Ambience:
+                    audioSource.outputAudioMixerGroup = _audioManagerData.AmbienceAudioMixerGroup;
                     break;
             }
         }
@@ -125,14 +131,16 @@ namespace Dino.Utility.Audio
 
         public void PlaySound(string soundName)
         {
+            if (_audioManagerData == null || _soundsContainer == null) return;
             AudioData audioData = _audioManagerData.audioData.Find(x => x.name == soundName);
             if (audioData == null)
             {
                 Debug.LogWarning("Sound: " + soundName + " not found!");
                 return;
             }
+            if (audioData.clip == null) return;
 
-            AudioSource audioSource = FindAudioSource(audioData.clip);
+            AudioSource audioSource = FindAudioSource(audioData.name);
 
             if (audioSource == null)
             {
@@ -143,9 +151,11 @@ namespace Dino.Utility.Audio
                 audioSource.loop = audioData.loop;
                 audioSource.volume = audioData.volume;
                 audioSource.pitch = audioData.pitch;
-                audioSource.Play();
+                audioSource.spatialBlend = 0f;
                 SetAudioInMixerGroup(audioSource, audioData.audioType);
                 _audioSources.Add(audioSource);
+                _sourcesByName.Add(audioData.name, audioSource);
+                audioSource.Play();
             }
             else
             {
@@ -155,6 +165,7 @@ namespace Dino.Utility.Audio
 
         public void StopSound(string soundName)
         {
+            if (_audioManagerData == null) return;
             AudioData audioData = _audioManagerData.audioData.Find(x => x.name == soundName);
             if (audioData == null)
             {
@@ -162,7 +173,7 @@ namespace Dino.Utility.Audio
                 return;
             }
 
-            AudioSource audioSource = FindAudioSource(audioData.clip);
+            AudioSource audioSource = FindAudioSource(audioData.name);
             if (audioSource != null)
             {
                 audioSource.Stop();
@@ -171,18 +182,19 @@ namespace Dino.Utility.Audio
         
         public void UpdateAudioMixerGroupVolume(float value, AudioType audioType)
         {
-            float volume = value;
+            float db = Mathf.Clamp(20f * Mathf.Log10(Mathf.Max(0.0001f, value)), -80f, 0f);
+            if (_audioManagerData == null) return;
 
             switch (audioType)
             {
                 case AudioType.Music:
-                    _audioManagerData.MusicAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.MusicVolumeParameterName, Mathf.Lerp(-80f, 20f, volume));
+                    if (_audioManagerData.MusicAudioMixerGroup != null) _audioManagerData.MusicAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.MusicVolumeParameterName, db);
                     break;
                 case AudioType.SFX:
-                    _audioManagerData.SfxAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.SfxVolumeParameterName, Mathf.Lerp(-80f, 20f, volume));
+                    if (_audioManagerData.SfxAudioMixerGroup != null) _audioManagerData.SfxAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.SfxVolumeParameterName, db);
                     break;
                 case AudioType.Ambience:
-                    _audioManagerData.AmbienceAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.AmbienceVolumeParameterName, Mathf.Lerp(-80f, 20f, volume));
+                    if (_audioManagerData.AmbienceAudioMixerGroup != null) _audioManagerData.AmbienceAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.AmbienceVolumeParameterName, db);
                     break;
                 
             }

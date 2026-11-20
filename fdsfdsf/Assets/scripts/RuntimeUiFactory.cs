@@ -35,6 +35,7 @@ public static class RuntimeUiFactory
         rect.sizeDelta = size; rect.anchoredPosition = position;
         var image = go.GetComponent<Image>(); image.color = new Color(.35f, .20f, .10f);
         var button = go.GetComponent<Button>(); button.targetGraphic = image;
+        go.AddComponent<ButtonFeedback>();
         var colors = button.colors; colors.normalColor = new Color(.48f, .28f, .12f); colors.highlightedColor = new Color(.70f, .46f, .19f);
         colors.pressedColor = new Color(.26f, .15f, .08f); colors.disabledColor = new Color(.25f, .23f, .20f, .55f); button.colors = colors;
         var text = Text(go.transform, label, Vector2.zero, size - new Vector2(12, 8), 22); text.raycastTarget = false;

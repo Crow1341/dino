@@ -9,7 +9,6 @@ public class SettingsUi : UIWindow
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private Button backButton;
-    [SerializeField] private string returnWindow = "GameplayUi";
 
     public override void Initialize()
     {
@@ -19,6 +18,9 @@ public class SettingsUi : UIWindow
         if (musicSlider != null) { Configure(musicSlider, "MusicVolume", 1f); musicSlider.onValueChanged.AddListener(SetMusic); }
         if (sfxSlider != null) { Configure(sfxSlider, "SfxVolume", 1f); sfxSlider.onValueChanged.AddListener(SetSfx); }
         if (backButton != null) backButton.onClick.AddListener(() => UiManager.Instance?.HideWindow("SettingsUi"));
+        if (masterSlider != null) SetMaster(masterSlider.value);
+        if (musicSlider != null) SetMusic(musicSlider.value);
+        if (sfxSlider != null) SetSfx(sfxSlider.value);
     }
 
     private void BuildRuntimeControls()

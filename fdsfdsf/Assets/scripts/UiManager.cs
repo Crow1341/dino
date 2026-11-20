@@ -34,6 +34,18 @@ public class UiManager : MonoBehaviour
                 discovered.ConfigureIdentity(discovered is PopUi ? "PopUi" : discovered.GetType().Name, discovered.CanvasRectTransform != null ? discovered.CanvasRectTransform : discovered.transform as RectTransform);
             if (!_uiWindows.Contains(discovered)) _uiWindows.Add(discovered);
         }
+        foreach (var button in FindObjectsByType<UnityEngine.UI.Button>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (button.GetComponent<ButtonFeedback>() == null) button.gameObject.AddComponent<ButtonFeedback>();
+            var colors = button.colors;
+            colors.normalColor = new Color(.48f, .31f, .16f, 1f);
+            colors.highlightedColor = new Color(.76f, .55f, .27f, 1f);
+            colors.pressedColor = new Color(.28f, .18f, .10f, 1f);
+            colors.selectedColor = colors.highlightedColor;
+            colors.disabledColor = new Color(.24f, .22f, .20f, .55f);
+            colors.fadeDuration = .12f;
+            button.colors = colors;
+        }
         CreateRuntimeSettingsWindow();
         CreateRuntimeEventWindow("WitchUi", true);
         CreateRuntimeEventWindow("BlacksmithUi", false);

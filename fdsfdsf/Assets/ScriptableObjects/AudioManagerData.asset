@@ -22,6 +22,48 @@ MonoBehaviour:
   - name: click
     clip: {fileID: 8300000, guid: 81c8d865ea5f2eb4ca93f4bc6bd107f2, type: 3}
     loop: 0
-    volume: 0
-    pitch: 0
+    volume: 0.8
+    pitch: 1
+    audioType: 1
+  - name: attack
+    clip: {fileID: 8300000, guid: 81c8d865ea5f2eb4ca93f4bc6bd107f2, type: 3}
+    loop: 0
+    volume: 0.8
+    pitch: 1
+    audioType: 1
+  - name: enemy_defeated
+    clip: {fileID: 8300000, guid: 81c8d865ea5f2eb4ca93f4bc6bd107f2, type: 3}
+    loop: 0
+    volume: 0.8
+    pitch: 0.85
+    audioType: 1
+  - name: reward
+    clip: {fileID: 8300000, guid: 81c8d865ea5f2eb4ca93f4bc6bd107f2, type: 3}
+    loop: 0
+    volume: 0.8
+    pitch: 1.15
+    audioType: 1
+  - name: purchase
+    clip: {fileID: 8300000, guid: 81c8d865ea5f2eb4ca93f4bc6bd107f2, type: 3}
+    loop: 0
+    volume: 0.8
+    pitch: 1
+    audioType: 1
+  - name: craft
+    clip: {fileID: 8300000, guid: 81c8d865ea5f2eb4ca93f4bc6bd107f2, type: 3}
+    loop: 0
+    volume: 0.8
+    pitch: 0.9
+    audioType: 1
+  - name: event
+    clip: {fileID: 8300000, guid: 81c8d865ea5f2eb4ca93f4bc6bd107f2, type: 3}
+    loop: 0
+    volume: 0.8
+    pitch: 1.1
+    audioType: 1
+  - name: music
+    clip: {fileID: 8300000, guid: 893e760548a927f418a354a86c5e9ba9, type: 3}
+    loop: 1
+    volume: 0.34
+    pitch: 1
     audioType: 0
