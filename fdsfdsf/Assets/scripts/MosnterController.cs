@@ -28,16 +28,19 @@ public class MosnterController : MonoBehaviour
     private int killCount = 0;
     private int lastSpriteIndex = -1;
     private GameplayManager gameplayManager;
+    private bool defeated;
 
     private void Awake()
     {
         gameplayManager = FindFirstObjectByType<GameplayManager>();
+        if (healthText != null) healthText.gameObject.SetActive(false);
+        if (healthBar != null) healthBar.gameObject.SetActive(false);
         LoadMonster();
     }
 
     public void TakeDamage(float damage)
     {
-        if (currentHealth <= 0)
+        if (defeated || currentHealth <= 0 || damage <= 0f)
             return;
 
         currentHealth -= damage;
@@ -47,7 +50,8 @@ public class MosnterController : MonoBehaviour
         {
             currentHealth = 0;
             RefreshUI();
-            gameplayManager.MonsterDefeated();
+            defeated = true;
+            if (gameplayManager != null) gameplayManager.MonsterDefeated();
             return;
         }
 
@@ -58,6 +62,7 @@ public class MosnterController : MonoBehaviour
     public void ResetMonster()
     {
         killCount = 0;
+        defeated = false;
         LoadMonster();
     }
 
@@ -65,8 +70,11 @@ public class MosnterController : MonoBehaviour
     public void NextMonster()
     {
         killCount++;
+        defeated = false;
         LoadMonster();
     }
+
+    public void StopCombat() { defeated = true; }
 
     private void LoadMonster()
     {

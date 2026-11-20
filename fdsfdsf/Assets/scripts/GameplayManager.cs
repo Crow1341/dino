@@ -14,7 +14,7 @@ public class GameplayManager : MonoBehaviour
 
     [Header("Click Damage")]
     [SerializeField] private float damagePerClick = 1f;
-    [Tooltip("Si esta activo, los clics sobre botones NO hacen daño (el resto de la pantalla si)")]
+    [Tooltip("Si esta activo, los clics sobre botones NO hacen daÃ±o (el resto de la pantalla si)")]
     [SerializeField] private bool ignoreClicksOverButtons = true;
 
     [Header("Windows")]
@@ -25,7 +25,15 @@ public class GameplayManager : MonoBehaviour
     [Tooltip("Inicia la partida automaticamente cada vez que se activa la UI de Gamplay")]
     [SerializeField] private bool startOnPlay = true;
 
+    [Header("Run rewards (Inspector)")]
+    [SerializeField] private Vector2Int xpPerEnemy = new Vector2Int(5, 10);
+    [SerializeField] private Vector2Int coinsPerEnemy = new Vector2Int(2, 6);
+    [SerializeField] private Vector2Int materialsPerEnemy = new Vector2Int(0, 2);
+    [SerializeField, Range(0f, 1f)] private float witchChance = 0.05f;
+    [SerializeField, Range(0f, 1f)] private float blacksmithChance = 0.05f;
+
     private bool gameEnded = true;
+    private bool defeatShown;
     private readonly List<RaycastResult> raycastResults = new List<RaycastResult>();
 
     // Se ejecuta cada vez que la UI de Gamplay se activa
@@ -55,7 +63,10 @@ public class GameplayManager : MonoBehaviour
 
     public void StartGame()
     {
+        if (monster == null || timer == null) { Debug.LogError("GameplayManager requires Monster and Timer references.", this); return; }
+        PlayerProgression.EnsureInstance();
         gameEnded = false;
+        defeatShown = false;
         monster.ResetMonster();
         timer.StartTimer();
     }
@@ -65,6 +76,7 @@ public class GameplayManager : MonoBehaviour
         if (gameEnded)
             return;
 
+        GrantEnemyRewards();
         monster.NextMonster();
         timer.StartTimer();
 
@@ -73,13 +85,16 @@ public class GameplayManager : MonoBehaviour
 
     public void Defeat()
     {
-        if (gameEnded)
+        if (gameEnded || defeatShown)
             return;
 
         gameEnded = true;
+        defeatShown = true;
         timer.StopTimer();
-
-        UiManager.Instance.ShowWindow(defeatWindow);
+        if (monster != null) monster.StopCombat();
+        if (PlayerProgression.Instance != null) PlayerProgression.Instance.LoseRun();
+        if (UiManager.Instance != null) UiManager.Instance.ShowWindow(defeatWindow);
+        else Debug.LogError("UiManager is missing; cannot show defeat window.", this);
 
         Debug.Log("Game Over!");
     }
@@ -87,8 +102,37 @@ public class GameplayManager : MonoBehaviour
     // Para mejoras desde otros scripts
     public void AddClickDamage(float amount)
     {
-        damagePerClick += amount;
+        damagePerClick = Mathf.Max(0f, damagePerClick + amount);
     }
+
+    public bool IsRunning => !gameEnded;
+    public float DamagePerClick => damagePerClick;
+
+    public void Retreat()
+    {
+        if (gameEnded) return;
+        gameEnded = true; timer.StopTimer();
+        if (monster != null) monster.StopCombat();
+        if (PlayerProgression.Instance != null) PlayerProgression.Instance.RetireRun();
+        if (UiManager.Instance != null) UiManager.Instance.ShowWindow("StartUi");
+    }
+
+    private void GrantEnemyRewards()
+    {
+        PlayerProgression progress = PlayerProgression.Instance;
+        if (progress == null) return;
+        int xp = Random.Range(Mathf.Min(xpPerEnemy.x, xpPerEnemy.y), Mathf.Max(xpPerEnemy.x, xpPerEnemy.y) + 1);
+        int coins = Random.Range(Mathf.Min(coinsPerEnemy.x, coinsPerEnemy.y), Mathf.Max(coinsPerEnemy.x, coinsPerEnemy.y) + 1);
+        int materials = Random.Range(Mathf.Min(materialsPerEnemy.x, materialsPerEnemy.y), Mathf.Max(materialsPerEnemy.x, materialsPerEnemy.y) + 1);
+        progress.AddRunRewards(xp, coins, materials);
+        Debug.Log($"Enemy reward: +{xp} XP, +{coins} coins, +{materials} materials");
+        float eventRoll = Random.value;
+        if (eventRoll < witchChance) SpecialEventRequested?.Invoke(SpecialEvent.Witch);
+        else if (eventRoll < witchChance + blacksmithChance) SpecialEventRequested?.Invoke(SpecialEvent.Blacksmith);
+    }
+
+    public enum SpecialEvent { Witch, Blacksmith }
+    public event System.Action<SpecialEvent> SpecialEventRequested;
 
     private bool ClickedThisFrame()
     {

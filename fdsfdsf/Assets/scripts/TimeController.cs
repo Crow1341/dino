@@ -9,15 +9,17 @@ public class TimeController : MonoBehaviour
 
     [Header("UI (opcional)")]
     [SerializeField] private TMP_Text timerText;
-    [Tooltip("El texto del tiempo aparece cuando queden estos segundos o menos (60 = ultimo minuto)")]
-    [SerializeField] private float showTimerBelowSeconds = 60f;
+    [Tooltip("Umbral para activar el estilo de advertencia")]
+    [SerializeField] private float warningBelowSeconds = 30f;
+    [SerializeField] private Color normalColor = Color.white;
+    [SerializeField] private Color warningColor = new Color(1f, 0.25f, 0.2f);
 
     private float currentTime;
     private bool timerRunning = false;
 
     private GameplayManager gameplayManager;
 
-    private void Start()
+    private void Awake()
     {
         gameplayManager = FindAnyObjectByType<GameplayManager>();
         currentTime = timeLimit;
@@ -61,12 +63,10 @@ public class TimeController : MonoBehaviour
         if (timerText == null)
             return;
 
-        // El texto solo se ve cuando queda poco tiempo
-        bool show = currentTime <= showTimerBelowSeconds;
-        if (timerText.gameObject.activeSelf != show)
-            timerText.gameObject.SetActive(show);
+        if (!timerText.gameObject.activeSelf) timerText.gameObject.SetActive(true);
 
         int total = Mathf.CeilToInt(currentTime);
         timerText.text = $"{total / 60:00}:{total % 60:00}";
+        timerText.color = currentTime <= warningBelowSeconds ? warningColor : normalColor;
     }
 }
