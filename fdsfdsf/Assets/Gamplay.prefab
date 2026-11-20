@@ -90,7 +90,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MosnterController
   baseMaxHealth: 1000
   healthMultiplierPerKill: 1.1
-  monsterSprites: []
+  monsterSprites:
+  - {fileID: -6595576342227625920, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 4538946322617163700, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 6003242603444026366, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 5103349399561810961, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -8984803165685866129, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -5585683815435715970, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 1623431482636722386, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -4012187423044869245, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -5751369687324414001, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -8435821437725767351, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 4722527937808715599, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -867819165857706860, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -4835566166149730970, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -4649582521693737963, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 3324602709329769401, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -1065594995281794915, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -3647302327862955510, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 2335337331848578661, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -3776687464760713100, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 5857399149025214744, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: 45432494715732152, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -7539355476419327973, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -2034260268444296075, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
+  - {fileID: -7561044296164538785, guid: 5ad9baa8deac2d4489e7dcfcd765de50, type: 3}
   monsterImage: {fileID: 3560762180252325493}
   monsterSpriteRenderer: {fileID: 0}
   nameText: {fileID: 1370266930022791891}

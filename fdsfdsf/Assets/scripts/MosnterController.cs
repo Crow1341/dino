@@ -1,4 +1,5 @@
 using TMPro;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +30,8 @@ public class MosnterController : MonoBehaviour
     private int lastSpriteIndex = -1;
     private GameplayManager gameplayManager;
     private bool defeated;
+    private Transform animatedVisual;
+    private Vector3 visualBaseScale = Vector3.one;
     public int KillCount => killCount;
     public float CurrentHealth => currentHealth;
     public int CurrentSpriteIndex => lastSpriteIndex;
@@ -36,6 +39,8 @@ public class MosnterController : MonoBehaviour
     private void Awake()
     {
         gameplayManager = FindFirstObjectByType<GameplayManager>();
+        animatedVisual = monsterImage != null ? monsterImage.transform : monsterSpriteRenderer != null ? monsterSpriteRenderer.transform : transform;
+        visualBaseScale = animatedVisual.localScale;
         if (healthText != null) healthText.gameObject.SetActive(false);
         if (healthBar != null) healthBar.gameObject.SetActive(false);
         LoadMonster();
@@ -47,6 +52,7 @@ public class MosnterController : MonoBehaviour
             return;
 
         currentHealth -= damage;
+        PlayHitEffect();
         Debug.Log($"Vida del monstruo: {Mathf.Max(0f, currentHealth)} / {maxHealth}");
 
         if (currentHealth <= 0)
@@ -54,7 +60,7 @@ public class MosnterController : MonoBehaviour
             currentHealth = 0;
             RefreshUI();
             defeated = true;
-            if (gameplayManager != null) gameplayManager.MonsterDefeated();
+            if (gameplayManager != null) StartCoroutine(DefeatAnimation());
             return;
         }
 
@@ -79,6 +85,24 @@ public class MosnterController : MonoBehaviour
 
     public void StopCombat() { defeated = true; }
 
+    private void PlayHitEffect()
+    {
+        if (animatedVisual == null) return;
+        animatedVisual.DOKill(); animatedVisual.localScale = visualBaseScale;
+        animatedVisual.DOScale(visualBaseScale * 0.94f, 0.07f).SetLoops(2, LoopType.Yoyo).SetEase(Ease.OutQuad);
+        if (monsterImage != null)
+        {
+            monsterImage.DOKill(); monsterImage.DOColor(new Color(1f, .55f, .48f), .06f).SetLoops(2, LoopType.Yoyo);
+        }
+    }
+
+    private System.Collections.IEnumerator DefeatAnimation()
+    {
+        if (animatedVisual != null) { animatedVisual.DOKill(); animatedVisual.DOScale(Vector3.zero, .14f).SetEase(Ease.InBack); }
+        yield return new WaitForSeconds(.15f);
+        if (gameplayManager != null) gameplayManager.MonsterDefeated();
+    }
+
     public void RestoreRun(int kills, float health, int spriteIndex)
     {
         killCount = Mathf.Max(0, kills); defeated = false; LoadMonster();
@@ -91,6 +115,7 @@ public class MosnterController : MonoBehaviour
     {
         maxHealth = baseMaxHealth * Mathf.Pow(healthMultiplierPerKill, killCount);
         currentHealth = maxHealth;
+        if (nameText != null) nameText.text = $"Enemy {killCount + 1}";
 
         SetRandomSprite();
         RefreshUI();
@@ -124,6 +149,12 @@ public class MosnterController : MonoBehaviour
 
         if (monsterSpriteRenderer != null)
             monsterSpriteRenderer.sprite = sprite;
+
+        if (animatedVisual != null)
+        {
+            animatedVisual.DOKill(); animatedVisual.localScale = Vector3.zero;
+            animatedVisual.DOScale(visualBaseScale, .32f).SetEase(Ease.OutBack);
+        }
     }
 
     private void RefreshUI()

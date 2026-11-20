@@ -33,9 +33,17 @@ public class StartUi : UIWindow
             Debug.LogWarning("Falta asignar el boton de Creditos.");
 
         if (settingsButton != null)
-            settingsButton.onClick.AddListener(() => OpenWindow(settingsWindow));
+            settingsButton.onClick.AddListener(OpenSettings);
         else
             Debug.LogWarning("Falta asignar el boton de Settings.");
+    }
+
+    private void OpenSettings()
+    {
+        if (UiManager.Instance == null) return;
+        UiManager.Instance.HideWindow("StartUi");
+        UiManager.Instance.ShowWindow("GameplayUi");
+        UiManager.Instance.ShowWindow(settingsWindow);
     }
 
     private void OpenWindow(string windowName)

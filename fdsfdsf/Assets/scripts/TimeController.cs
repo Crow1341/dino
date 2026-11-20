@@ -24,6 +24,22 @@ public class TimeController : MonoBehaviour
     private void Awake()
     {
         gameplayManager = FindAnyObjectByType<GameplayManager>();
+        if (timerText == null)
+        {
+            var parent = transform.parent as RectTransform;
+            if (parent == null)
+            {
+                var canvas = FindAnyObjectByType<Canvas>();
+                if (canvas != null) parent = canvas.transform as RectTransform;
+            }
+            if (parent != null)
+            {
+                timerText = RuntimeUiFactory.Text(parent, "05:00", new Vector2(0, -40), new Vector2(240, 70), 38);
+                timerText.name = "Run Timer Text"; timerText.fontStyle = TMPro.FontStyles.Bold;
+                timerText.rectTransform.anchorMin = timerText.rectTransform.anchorMax = new Vector2(.5f, 1f);
+                timerText.rectTransform.pivot = new Vector2(.5f, 1f);
+            }
+        }
         currentTime = timeLimit;
         RefreshUI();
     }
@@ -61,7 +77,7 @@ public class TimeController : MonoBehaviour
             timerRunning = false;
             RefreshUI();
 
-            gameplayManager.Defeat();
+            if (gameplayManager != null) gameplayManager.Defeat();
             return;
         }
 
