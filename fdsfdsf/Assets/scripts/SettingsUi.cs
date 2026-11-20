@@ -14,10 +14,23 @@ public class SettingsUi : UIWindow
     public override void Initialize()
     {
         base.Initialize();
+        if (masterSlider == null || musicSlider == null || sfxSlider == null) BuildRuntimeControls();
         if (masterSlider != null) { Configure(masterSlider, "MasterVolume", 1f); masterSlider.onValueChanged.AddListener(SetMaster); }
         if (musicSlider != null) { Configure(musicSlider, "MusicVolume", 1f); musicSlider.onValueChanged.AddListener(SetMusic); }
         if (sfxSlider != null) { Configure(sfxSlider, "SfxVolume", 1f); sfxSlider.onValueChanged.AddListener(SetSfx); }
-        if (backButton != null) backButton.onClick.AddListener(() => UiManager.Instance?.ShowWindow(returnWindow));
+        if (backButton != null) backButton.onClick.AddListener(() => UiManager.Instance?.HideWindow("SettingsUi"));
+    }
+
+    private void BuildRuntimeControls()
+    {
+        RectTransform root = CanvasRectTransform;
+        if (root == null) return;
+        var panel = RuntimeUiFactory.Panel(root, "Audio Settings Panel", new Vector2(650, 510), Vector2.zero);
+        RuntimeUiFactory.Text(panel, "SETTINGS", new Vector2(0, 195), new Vector2(500, 55), 34);
+        masterSlider = RuntimeUiFactory.Slider(panel, "Master volume", 95);
+        musicSlider = RuntimeUiFactory.Slider(panel, "Music volume", 0);
+        sfxSlider = RuntimeUiFactory.Slider(panel, "Effects volume", -95);
+        backButton = RuntimeUiFactory.Button(panel, "RETURN TO GAME", new Vector2(0, -190), new Vector2(280, 64), null);
     }
 
     private static void Configure(Slider slider, string key, float fallback)

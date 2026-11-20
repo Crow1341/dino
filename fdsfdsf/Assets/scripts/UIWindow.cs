@@ -21,6 +21,7 @@ public class UIWindow : MonoBehaviour
     public CanvasGroup CanvasGroup => _canvasGroup;
     public RectTransform CanvasRectTransform => _canvasRectTransform;
     public string Id => _id;
+    public void ConfigureIdentity(string id, RectTransform root) { _id = id; _canvasRectTransform = root; _canvasGroup = root != null ? root.GetComponent<CanvasGroup>() : null; }
     void Start()
     {
         if (_canvasRectTransform == null) _canvasRectTransform = transform as RectTransform;
@@ -43,7 +44,9 @@ public class UIWindow : MonoBehaviour
         if (_canvasRectTransform == null) { Debug.LogError($"{name} has no window RectTransform.", this); return; }
         if (_canvasGroup == null) _canvasGroup = _canvasRectTransform.GetComponent<CanvasGroup>();
         _canvasRectTransform.DOKill();
+        if (_canvasGroup != null) _canvasGroup.DOKill();
         _canvasRectTransform.gameObject.SetActive(true);
+        _canvasRectTransform.SetAsLastSibling();
         if (_canvasGroup != null) { _canvasGroup.interactable = true; _canvasGroup.blocksRaycasts = true; }
         if (instant) { _canvasRectTransform.localScale = Vector3.one; if (_canvasGroup != null) _canvasGroup.alpha = 1f; return; }
         _canvasRectTransform.localScale = Vector3.one * 0.85f;
@@ -59,6 +62,7 @@ public class UIWindow : MonoBehaviour
         if (_canvasRectTransform == null) return;
         if (_canvasGroup == null) _canvasGroup = _canvasRectTransform.GetComponent<CanvasGroup>();
         _canvasRectTransform.DOKill();
+        if (_canvasGroup != null) _canvasGroup.DOKill();
         if (_canvasGroup != null) { _canvasGroup.interactable = false; _canvasGroup.blocksRaycasts = false; }
         if (instant) { _canvasRectTransform.localScale = Vector3.zero; _canvasRectTransform.gameObject.SetActive(false); return; }
         _canvasRectTransform.DOScale(Vector3.one * 0.85f, hideDuration).SetEase(hideEase).OnComplete(() => _canvasRectTransform.gameObject.SetActive(false));

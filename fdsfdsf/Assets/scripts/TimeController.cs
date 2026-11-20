@@ -18,6 +18,7 @@ public class TimeController : MonoBehaviour
     private bool timerRunning = false;
 
     private GameplayManager gameplayManager;
+    public float RemainingTime => currentTime;
 
     private void Awake()
     {

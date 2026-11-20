@@ -1,52 +1,44 @@
+using TMPro;
 using UnityEngine;
-using NaughtyAttributes;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using System.Collections;
 
 public class BackpackUi : UIWindow
 {
-    [Header("Botones")]
     public Button backButton;
-
-    [Header("Nombres de las ventanas")]
     [SerializeField] private string gameplayWindow = "GameplayUi";
-
-    [SerializeField] private float delay = 1f;
+    private TMP_Text contents;
+    private Button potionButton;
 
     public override void Initialize()
     {
         base.Initialize();
-
-        backButton.onClick.AddListener(() => OpenWindow(gameplayWindow));
+        if (backButton != null) backButton.onClick.AddListener(() => { UiManager.Instance?.HideWindow(Id); UiManager.Instance?.ShowWindow(gameplayWindow); });
+        if (CanvasRectTransform != null)
+        {
+            var panel = RuntimeUiFactory.Panel(CanvasRectTransform, "Inventory status", new Vector2(560, 430), Vector2.zero);
+            contents = RuntimeUiFactory.Text(panel, string.Empty, new Vector2(0, 52), new Vector2(520, 300), 22);
+            potionButton = RuntimeUiFactory.Button(panel, "USE POTION (+5 DAMAGE / 20 SEC)", new Vector2(0, -150), new Vector2(410, 58), UsePotion);
+            Refresh();
+        }
     }
 
-    private void OpenWindow(string windowName)
+    private void OnEnable() { if (PlayerProgression.Instance != null) PlayerProgression.Instance.Changed += Refresh; }
+    private void OnDisable() { if (PlayerProgression.Instance != null) PlayerProgression.Instance.Changed -= Refresh; }
+    private void Update() { Refresh(); }
+
+    private void Refresh()
     {
-        StartCoroutine(SwitchWindow(windowName));
+        if (contents == null) return;
+        var p = PlayerProgression.Instance;
+        if (p == null) { contents.text = "Loading profile..."; return; }
+        contents.text = $"COINS      {p.TotalCoins}  (run +{p.RunCoins})\nEXPERIENCE {p.TotalXp}  (run +{p.RunXp})\nMATERIALS  {p.TotalMaterials}  (run +{p.RunMaterials})\nPOTIONS    {p.Potions}\nSWORD      {(p.EquippedSword == 0 ? "Starter" : "Steel " + p.EquippedSword)}  (+{p.SwordDamage:0} damage)";
+        if (potionButton != null) potionButton.interactable = p.Potions > 0;
     }
 
-    private IEnumerator SwitchWindow(string windowName)
+    private void UsePotion()
     {
-        UiManager.Instance.HideWindow("BackpakcUi");
-        yield return new WaitForSeconds(delay);
-        UiManager.Instance.ShowWindow(windowName);
+        var manager = FindFirstObjectByType<GameplayManager>();
+        if (manager != null) manager.UseDamagePotion();
+        Refresh();
     }
-
-
-    #region Test Methods
-
-    [Button("Test Show")]
-    private void TestShow()
-    {
-        Show();
-    }
-
-    [Button("Test Hide")]
-    private void TestHide()
-    {
-        Hide();
-    }
-
-    #endregion
 }

@@ -24,6 +24,47 @@ public class UiManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
+    private System.Collections.IEnumerator Start()
+    {
+        if (_uiWindows == null) _uiWindows = new List<UIWindow>();
+        foreach (var discovered in FindObjectsByType<UIWindow>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (discovered == null) continue;
+            if (string.IsNullOrEmpty(discovered.Id))
+                discovered.ConfigureIdentity(discovered is PopUi ? "PopUi" : discovered.GetType().Name, discovered.CanvasRectTransform != null ? discovered.CanvasRectTransform : discovered.transform as RectTransform);
+            if (!_uiWindows.Contains(discovered)) _uiWindows.Add(discovered);
+        }
+        CreateRuntimeSettingsWindow();
+        CreateRuntimeEventWindow("WitchUi", true);
+        CreateRuntimeEventWindow("BlacksmithUi", false);
+        yield return null;
+        if (GetWindow("StartUi") != null) ShowWindow("StartUi");
+    }
+
+    private void CreateRuntimeSettingsWindow()
+    {
+        if (GetWindow("SettingsUi") != null) return;
+        UIWindow gameplay = GetWindow("GameplayUi");
+        if (gameplay == null || gameplay.CanvasRectTransform == null) return;
+        var go = new GameObject("SettingsUI (runtime)", typeof(RectTransform), typeof(CanvasGroup), typeof(SettingsUi));
+        var rect = (RectTransform)go.transform; rect.SetParent(gameplay.CanvasRectTransform, false);
+        rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = rect.offsetMax = Vector2.zero;
+        var settings = go.GetComponent<SettingsUi>(); settings.ConfigureIdentity("SettingsUi", rect);
+        _uiWindows.Add(settings); settings.Hide(true);
+    }
+
+    private void CreateRuntimeEventWindow(string id, bool witch)
+    {
+        if (GetWindow(id) != null) return;
+        UIWindow gameplay = GetWindow("GameplayUi");
+        if (gameplay == null || gameplay.CanvasRectTransform == null) return;
+        var go = new GameObject(id + " (runtime)", typeof(RectTransform), typeof(CanvasGroup), typeof(EventShopUi));
+        var rect = (RectTransform)go.transform; rect.SetParent(gameplay.CanvasRectTransform, false);
+        rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = rect.offsetMax = Vector2.zero;
+        var shop = go.GetComponent<EventShopUi>(); shop.ConfigureIdentity(id, rect); shop.SetWitch(witch);
+        _uiWindows.Add(shop); shop.Hide(true);
+    }
+
     public void ShowWindow(string windowName)
     {
         UIWindow window = FindWindow(windowName);

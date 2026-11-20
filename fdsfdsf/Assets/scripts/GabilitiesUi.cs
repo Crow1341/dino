@@ -1,51 +1,57 @@
+using TMPro;
 using UnityEngine;
-using NaughtyAttributes;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using System.Collections;
 
 public class GabilitiesUi : UIWindow
 {
-    [Header("Botones")]
     public Button backButton;
-
-    [Header("Nombres de las ventanas")]
     [SerializeField] private string gameplayWindow = "GameplayUi";
-
-    [SerializeField] private float delay = 1f;
+    private TMP_Text balance;
+    private readonly Button[] buyButtons = new Button[3];
+    private readonly string[] names = { "Sharper strikes", "Heavy blade", "Critical focus" };
+    private readonly string[] descriptions = { "+1 damage per rank", "+2 damage per rank", "+10% critical chance per rank" };
 
     public override void Initialize()
     {
         base.Initialize();
-
-        backButton.onClick.AddListener(() => OpenWindow(gameplayWindow));
+        if (backButton != null) backButton.onClick.AddListener(() => { UiManager.Instance?.HideWindow(Id); UiManager.Instance?.ShowWindow(gameplayWindow); });
+        if (CanvasRectTransform != null)
+        {
+            var panel = RuntimeUiFactory.Panel(CanvasRectTransform, "Skill tree", new Vector2(720, 490), Vector2.zero);
+            RuntimeUiFactory.Text(panel, "ABILITIES", new Vector2(0, 190), new Vector2(600, 48), 34);
+            balance = RuntimeUiFactory.Text(panel, "", new Vector2(0, 135), new Vector2(600, 42), 22);
+            for (int i = 0; i < buyButtons.Length; i++)
+            {
+                int skill = i;
+                float y = 62 - 105 * i;
+                RuntimeUiFactory.Text(panel, names[i] + "\n" + descriptions[i], new Vector2(-145, y), new Vector2(300, 75), 20);
+                buyButtons[i] = RuntimeUiFactory.Button(panel, "UPGRADE", new Vector2(205, y), new Vector2(220, 58), () => Buy(skill));
+            }
+        }
+        Refresh();
     }
 
-    private void OpenWindow(string windowName)
+    private void Buy(int skill)
     {
-        StartCoroutine(SwitchWindow(windowName));
+        var p = PlayerProgression.Instance;
+        if (p != null && !p.UpgradeSkill(skill)) Debug.Log("Not enough XP or maximum skill rank reached.");
+        Refresh();
     }
 
-    private IEnumerator SwitchWindow(string windowName)
+    private void Update() { Refresh(); }
+
+    private void Refresh()
     {
-        UiManager.Instance.HideWindow("HabilitiesUi");
-        yield return new WaitForSeconds(delay);
-        UiManager.Instance.ShowWindow(windowName);
+        var p = PlayerProgression.Instance;
+        if (p == null || balance == null) return;
+        balance.text = "Available XP: " + p.TotalXp;
+        for (int i = 0; i < buyButtons.Length; i++)
+        {
+            if (buyButtons[i] == null) continue;
+            int rank = p.GetSkillLevel(i);
+            var label = buyButtons[i].GetComponentInChildren<TMP_Text>();
+            if (label != null) label.text = rank >= 3 ? "MAX RANK" : $"RANK {rank}  |  {p.GetSkillCost(i)} XP";
+            buyButtons[i].interactable = rank < 3 && p.TotalXp >= p.GetSkillCost(i);
+        }
     }
-
-    #region Test Methods
-
-    [Button("Test Show")]
-    private void TestShow()
-    {
-        Show();
-    }
-
-    [Button("Test Hide")]
-    private void TestHide()
-    {
-        Hide();
-    }
-
-    #endregion
 }

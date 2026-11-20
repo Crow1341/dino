@@ -34,11 +34,15 @@ public class GameplayManager : MonoBehaviour
 
     private bool gameEnded = true;
     private bool defeatShown;
+    private float potionBonus;
+    private Coroutine potionRoutine;
     private readonly List<RaycastResult> raycastResults = new List<RaycastResult>();
 
     // Se ejecuta cada vez que la UI de Gamplay se activa
     private void OnEnable()
     {
+        SpecialEventRequested += HandleSpecialEvent;
+        ignoreClicksOverButtons = true;
         if (startOnPlay)
             StartGame();
     }
@@ -46,6 +50,7 @@ public class GameplayManager : MonoBehaviour
     // Al desactivarse la UI, la partida se pausa
     private void OnDisable()
     {
+        SpecialEventRequested -= HandleSpecialEvent;
         gameEnded = true;
 
         if (timer != null)
@@ -57,8 +62,15 @@ public class GameplayManager : MonoBehaviour
         if (gameEnded)
             return;
 
-        if (ClickedThisFrame())
-            monster.TakeDamage(damagePerClick);
+        if (ClickedThisFrame() && monster != null)
+        {
+            float skillBonus = PlayerProgression.Instance != null ? PlayerProgression.Instance.GetSkillLevel(0) : 0;
+            if (PlayerProgression.Instance != null) skillBonus += PlayerProgression.Instance.GetSkillLevel(1) * 2f;
+            float swordBonus = PlayerProgression.Instance != null ? PlayerProgression.Instance.SwordDamage : 0;
+            float damage = damagePerClick + skillBonus + swordBonus + potionBonus;
+            if (PlayerProgression.Instance != null && Random.value < PlayerProgression.Instance.GetSkillLevel(2) * 0.1f) damage *= 2f;
+            monster.TakeDamage(damage);
+        }
     }
 
     public void StartGame()
@@ -107,6 +119,21 @@ public class GameplayManager : MonoBehaviour
 
     public bool IsRunning => !gameEnded;
     public float DamagePerClick => damagePerClick;
+    public float RemainingTime => timer != null ? timer.RemainingTime : 0f;
+
+    public void UseDamagePotion()
+    {
+        if (gameEnded || PlayerProgression.Instance == null || !PlayerProgression.Instance.UsePotion()) return;
+        if (potionRoutine != null) StopCoroutine(potionRoutine);
+        potionBonus = 5f;
+        potionRoutine = StartCoroutine(PotionBoost());
+    }
+
+    private System.Collections.IEnumerator PotionBoost()
+    {
+        yield return new WaitForSeconds(20f);
+        potionBonus = 0f; potionRoutine = null;
+    }
 
     public void Retreat()
     {
@@ -114,7 +141,15 @@ public class GameplayManager : MonoBehaviour
         gameEnded = true; timer.StopTimer();
         if (monster != null) monster.StopCombat();
         if (PlayerProgression.Instance != null) PlayerProgression.Instance.RetireRun();
+        if (UiManager.Instance != null) UiManager.Instance.HideWindow("GameplayUi");
         if (UiManager.Instance != null) UiManager.Instance.ShowWindow("StartUi");
+    }
+
+    public void RestartGame()
+    {
+        if (UiManager.Instance != null) UiManager.Instance.HideWindow(defeatWindow);
+        if (UiManager.Instance != null) UiManager.Instance.ShowWindow("GameplayUi");
+        StartGame();
     }
 
     private void GrantEnemyRewards()
@@ -133,6 +168,12 @@ public class GameplayManager : MonoBehaviour
 
     public enum SpecialEvent { Witch, Blacksmith }
     public event System.Action<SpecialEvent> SpecialEventRequested;
+
+    private void HandleSpecialEvent(SpecialEvent specialEvent)
+    {
+        if (UiManager.Instance == null) return;
+        UiManager.Instance.ShowWindow(specialEvent == SpecialEvent.Witch ? "WitchUi" : "BlacksmithUi");
+    }
 
     private bool ClickedThisFrame()
     {
