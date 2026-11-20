@@ -39,18 +39,22 @@ public class EventShopUi : UIWindow
     private void BuyPotion()
     {
         var profile = PlayerProgression.Instance;
-        if (profile != null && profile.SpendCoins(potionPrice)) profile.AddPotion();
+        bool purchased = profile != null && profile.SpendCoins(potionPrice);
+        if (purchased) profile.AddPotion();
         else if (status != null) status.text = "Not enough coins.";
         Refresh();
+        if (purchased && Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("purchase");
     }
 
     private void CraftSword(int sword)
     {
         var profile = PlayerProgression.Instance;
         int cost = sword == 1 ? steelSwordMaterials : enchantedSwordMaterials;
-        if (profile != null && profile.CraftSword(sword, cost)) profile.EquipSword(sword);
+        bool crafted = profile != null && profile.CraftSword(sword, cost);
+        if (crafted) profile.EquipSword(sword);
         else if (status != null) status.text = "Not enough materials or already crafted.";
         Refresh();
+        if (crafted && Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("craft");
     }
 
     private void Refresh()

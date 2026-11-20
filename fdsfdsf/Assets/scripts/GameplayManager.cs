@@ -64,6 +64,7 @@ public class GameplayManager : MonoBehaviour
 
         if (ClickedThisFrame() && monster != null)
         {
+            if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("attack");
             float skillBonus = PlayerProgression.Instance != null ? PlayerProgression.Instance.GetSkillLevel(0) : 0;
             if (PlayerProgression.Instance != null) skillBonus += PlayerProgression.Instance.GetSkillLevel(1) * 2f;
             float swordBonus = PlayerProgression.Instance != null ? PlayerProgression.Instance.SwordDamage : 0;
@@ -76,11 +77,18 @@ public class GameplayManager : MonoBehaviour
     public void StartGame()
     {
         if (monster == null || timer == null) { Debug.LogError("GameplayManager requires Monster and Timer references.", this); return; }
-        PlayerProgression.EnsureInstance();
+        PlayerProgression progress = PlayerProgression.EnsureInstance();
         gameEnded = false;
         defeatShown = false;
-        monster.ResetMonster();
-        timer.StartTimer();
+        if (progress.IsRunActive)
+        {
+            monster.RestoreRun(progress.RunEnemyKills, progress.SavedEnemyHealth, progress.SavedSpriteIndex);
+            timer.StartTimer(progress.SavedTimeRemaining);
+        }
+        else
+        {
+            progress.BeginNewRun(); monster.ResetMonster(); timer.StartTimer();
+        }
     }
 
     public void MonsterDefeated()
@@ -89,8 +97,10 @@ public class GameplayManager : MonoBehaviour
             return;
 
         GrantEnemyRewards();
+        if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("enemy_defeated");
         monster.NextMonster();
         timer.StartTimer();
+        if (PlayerProgression.Instance != null) PlayerProgression.Instance.SaveRunSnapshot(timer.RemainingTime, monster.KillCount, monster.CurrentHealth, monster.CurrentSpriteIndex);
 
         Debug.Log("Next monster appeared!");
     }
@@ -120,6 +130,7 @@ public class GameplayManager : MonoBehaviour
     public bool IsRunning => !gameEnded;
     public float DamagePerClick => damagePerClick;
     public float RemainingTime => timer != null ? timer.RemainingTime : 0f;
+    public MosnterController GetMonster() => monster;
 
     public void UseDamagePotion()
     {
@@ -160,10 +171,11 @@ public class GameplayManager : MonoBehaviour
         int coins = Random.Range(Mathf.Min(coinsPerEnemy.x, coinsPerEnemy.y), Mathf.Max(coinsPerEnemy.x, coinsPerEnemy.y) + 1);
         int materials = Random.Range(Mathf.Min(materialsPerEnemy.x, materialsPerEnemy.y), Mathf.Max(materialsPerEnemy.x, materialsPerEnemy.y) + 1);
         progress.AddRunRewards(xp, coins, materials);
+        if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("reward");
         Debug.Log($"Enemy reward: +{xp} XP, +{coins} coins, +{materials} materials");
         float eventRoll = Random.value;
         if (eventRoll < witchChance) SpecialEventRequested?.Invoke(SpecialEvent.Witch);
-        else if (eventRoll < witchChance + blacksmithChance) SpecialEventRequested?.Invoke(SpecialEvent.Blacksmith);
+        else if (eventRoll < Mathf.Min(1f, witchChance + blacksmithChance)) SpecialEventRequested?.Invoke(SpecialEvent.Blacksmith);
     }
 
     public enum SpecialEvent { Witch, Blacksmith }
@@ -171,6 +183,7 @@ public class GameplayManager : MonoBehaviour
 
     private void HandleSpecialEvent(SpecialEvent specialEvent)
     {
+        if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("event");
         if (UiManager.Instance == null) return;
         UiManager.Instance.ShowWindow(specialEvent == SpecialEvent.Witch ? "WitchUi" : "BlacksmithUi");
     }

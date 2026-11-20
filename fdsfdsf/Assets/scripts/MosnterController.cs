@@ -29,6 +29,9 @@ public class MosnterController : MonoBehaviour
     private int lastSpriteIndex = -1;
     private GameplayManager gameplayManager;
     private bool defeated;
+    public int KillCount => killCount;
+    public float CurrentHealth => currentHealth;
+    public int CurrentSpriteIndex => lastSpriteIndex;
 
     private void Awake()
     {
@@ -76,6 +79,14 @@ public class MosnterController : MonoBehaviour
 
     public void StopCombat() { defeated = true; }
 
+    public void RestoreRun(int kills, float health, int spriteIndex)
+    {
+        killCount = Mathf.Max(0, kills); defeated = false; LoadMonster();
+        if (spriteIndex >= 0 && monsterSprites != null && spriteIndex < monsterSprites.Length) SetSprite(spriteIndex);
+        if (health > 0) currentHealth = Mathf.Min(maxHealth, health);
+        RefreshUI();
+    }
+
     private void LoadMonster()
     {
         maxHealth = baseMaxHealth * Mathf.Pow(healthMultiplierPerKill, killCount);
@@ -99,6 +110,12 @@ public class MosnterController : MonoBehaviour
                 index = Random.Range(0, monsterSprites.Length);
         }
 
+        SetSprite(index);
+    }
+
+    private void SetSprite(int index)
+    {
+        if (monsterSprites == null || index < 0 || index >= monsterSprites.Length) return;
         lastSpriteIndex = index;
         Sprite sprite = monsterSprites[index];
 

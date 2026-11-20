@@ -19,6 +19,7 @@ public class TimeController : MonoBehaviour
 
     private GameplayManager gameplayManager;
     public float RemainingTime => currentTime;
+    private int lastSavedSecond = -1;
 
     private void Awake()
     {
@@ -29,8 +30,14 @@ public class TimeController : MonoBehaviour
 
     public void StartTimer()
     {
-        currentTime = timeLimit;
+        StartTimer(timeLimit);
+    }
+
+    public void StartTimer(float seconds)
+    {
+        currentTime = Mathf.Clamp(seconds, 0f, timeLimit);
         timerRunning = true;
+        lastSavedSecond = -1;
         RefreshUI();
     }
 
@@ -40,6 +47,13 @@ public class TimeController : MonoBehaviour
             return;
 
         currentTime -= Time.deltaTime;
+        int wholeSecond = Mathf.CeilToInt(currentTime);
+        if (wholeSecond != lastSavedSecond)
+        {
+            lastSavedSecond = wholeSecond;
+            if (PlayerProgression.Instance != null && gameplayManager != null && gameplayManager.IsRunning && gameplayManager.GetMonster() != null)
+                PlayerProgression.Instance.SaveRunSnapshot(currentTime, gameplayManager.GetMonster().KillCount, gameplayManager.GetMonster().CurrentHealth, gameplayManager.GetMonster().CurrentSpriteIndex);
+        }
 
         if (currentTime <= 0)
         {

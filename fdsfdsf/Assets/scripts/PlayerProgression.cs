@@ -13,6 +13,11 @@ public sealed class PlayerProgression : MonoBehaviour
     public int RunCoins { get; private set; }
     public int RunMaterials { get; private set; }
     public int Potions { get; private set; }
+    public bool IsRunActive { get; private set; }
+    public int RunEnemyKills { get; private set; }
+    public float SavedEnemyHealth { get; private set; }
+    public float SavedTimeRemaining { get; private set; }
+    public int SavedSpriteIndex { get; private set; }
     public int EquippedSword { get; private set; }
     public float SwordDamage => EquippedSword == 1 ? 3f : EquippedSword == 2 ? 8f : 0f;
     public int TotalXp => PermanentXp + RunXp;
@@ -36,7 +41,18 @@ public sealed class PlayerProgression : MonoBehaviour
 
     public void AddRunRewards(int xp, int coins, int materials)
     {
-        RunXp += Mathf.Max(0, xp); RunCoins += Mathf.Max(0, coins); RunMaterials += Mathf.Max(0, materials); Changed?.Invoke();
+        RunXp += Mathf.Max(0, xp); RunCoins += Mathf.Max(0, coins); RunMaterials += Mathf.Max(0, materials); Save(); Changed?.Invoke();
+    }
+
+    public void BeginNewRun()
+    {
+        RunXp = RunCoins = RunMaterials = 0; RunEnemyKills = 0; SavedEnemyHealth = 0; SavedTimeRemaining = 300f; SavedSpriteIndex = -1; IsRunActive = true; Save(); Changed?.Invoke();
+    }
+
+    public void SaveRunSnapshot(float timeRemaining, int kills, float enemyHealth, int spriteIndex)
+    {
+        if (!IsRunActive) return;
+        SavedTimeRemaining = Mathf.Max(0, timeRemaining); RunEnemyKills = Mathf.Max(0, kills); SavedEnemyHealth = Mathf.Max(0, enemyHealth); SavedSpriteIndex = spriteIndex; Save();
     }
 
     public bool SpendCoins(int amount)
@@ -60,8 +76,8 @@ public sealed class PlayerProgression : MonoBehaviour
         Save(); Changed?.Invoke(); return true;
     }
 
-    public void AddPotion() { Potions++; Changed?.Invoke(); }
-    public bool UsePotion() { if (Potions <= 0) return false; Potions--; Changed?.Invoke(); return true; }
+    public void AddPotion() { Potions++; Save(); Changed?.Invoke(); }
+    public bool UsePotion() { if (Potions <= 0) return false; Potions--; Save(); Changed?.Invoke(); return true; }
 
     public int GetSkillLevel(int skill) => PlayerPrefs.GetInt("Skill." + skill, 0);
     public int GetSkillCost(int skill) => 20 * (GetSkillLevel(skill) + 1) * (skill + 1);
@@ -88,18 +104,21 @@ public sealed class PlayerProgression : MonoBehaviour
     public void RetireRun()
     {
         PermanentXp += RunXp; PermanentCoins += RunCoins; PermanentMaterials += RunMaterials;
-        RunXp = RunCoins = RunMaterials = 0; Save(); Changed?.Invoke();
+        RunXp = RunCoins = RunMaterials = 0; IsRunActive = false; RunEnemyKills = 0; SavedEnemyHealth = 0; SavedTimeRemaining = 0; SavedSpriteIndex = -1; Save(); Changed?.Invoke();
     }
 
     public void LoseRun()
     {
-        RunXp = RunCoins = RunMaterials = 0; Save(); Changed?.Invoke();
+        RunXp = RunCoins = RunMaterials = 0; IsRunActive = false; RunEnemyKills = 0; SavedEnemyHealth = 0; SavedTimeRemaining = 0; SavedSpriteIndex = -1; Save(); Changed?.Invoke();
     }
 
     private void Save()
     {
         PlayerPrefs.SetInt("Profile.Xp", PermanentXp); PlayerPrefs.SetInt("Profile.Coins", PermanentCoins);
-        PlayerPrefs.SetInt("Profile.Materials", PermanentMaterials); PlayerPrefs.SetInt("Profile.Potions", Potions); PlayerPrefs.Save();
+        PlayerPrefs.SetInt("Profile.Materials", PermanentMaterials); PlayerPrefs.SetInt("Profile.Potions", Potions);
+        PlayerPrefs.SetInt("Run.Xp", RunXp); PlayerPrefs.SetInt("Run.Coins", RunCoins); PlayerPrefs.SetInt("Run.Materials", RunMaterials);
+        PlayerPrefs.SetInt("Run.Active", IsRunActive ? 1 : 0); PlayerPrefs.SetInt("Run.Kills", RunEnemyKills);
+        PlayerPrefs.SetFloat("Run.EnemyHealth", SavedEnemyHealth); PlayerPrefs.SetFloat("Run.Time", SavedTimeRemaining); PlayerPrefs.SetInt("Run.Sprite", SavedSpriteIndex); PlayerPrefs.Save();
     }
 
     private void Load()
@@ -107,5 +126,9 @@ public sealed class PlayerProgression : MonoBehaviour
         PermanentXp = PlayerPrefs.GetInt("Profile.Xp", 0); PermanentCoins = PlayerPrefs.GetInt("Profile.Coins", 0);
         PermanentMaterials = PlayerPrefs.GetInt("Profile.Materials", 0); Potions = PlayerPrefs.GetInt("Profile.Potions", 0);
         EquippedSword = PlayerPrefs.GetInt("EquippedSword", 0);
+        RunXp = PlayerPrefs.GetInt("Run.Xp", 0); RunCoins = PlayerPrefs.GetInt("Run.Coins", 0); RunMaterials = PlayerPrefs.GetInt("Run.Materials", 0);
+        IsRunActive = PlayerPrefs.GetInt("Run.Active", 0) == 1; RunEnemyKills = PlayerPrefs.GetInt("Run.Kills", 0);
+        SavedEnemyHealth = PlayerPrefs.GetFloat("Run.EnemyHealth", 0); SavedTimeRemaining = PlayerPrefs.GetFloat("Run.Time", 300f);
+        SavedSpriteIndex = PlayerPrefs.GetInt("Run.Sprite", -1);
     }
 }
