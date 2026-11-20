@@ -23,6 +23,8 @@ public class UIWindow : MonoBehaviour
     public string Id => _id;
     void Start()
     {
+        if (_canvasRectTransform == null) _canvasRectTransform = transform as RectTransform;
+        if (_canvasGroup == null && _canvasRectTransform != null) _canvasGroup = _canvasRectTransform.GetComponent<CanvasGroup>();
         Initialize();
     }
 
@@ -37,32 +39,29 @@ public class UIWindow : MonoBehaviour
     [Button]
     public virtual void Show(bool instant = false)
     {
-        if (instant)
-        {
-            _canvasRectTransform.gameObject.SetActive(true);
-        }
-        else
-        {
-            _canvasRectTransform.gameObject.SetActive(true);
-            RectTransform rectTransform = _canvasGroup.GetComponent<RectTransform>();
-            rectTransform.DOScale(Vector3.one, showDuration).SetEase(showEase);
-        }
+        if (_canvasRectTransform == null) _canvasRectTransform = transform as RectTransform;
+        if (_canvasRectTransform == null) { Debug.LogError($"{name} has no window RectTransform.", this); return; }
+        if (_canvasGroup == null) _canvasGroup = _canvasRectTransform.GetComponent<CanvasGroup>();
+        _canvasRectTransform.DOKill();
+        _canvasRectTransform.gameObject.SetActive(true);
+        if (_canvasGroup != null) { _canvasGroup.interactable = true; _canvasGroup.blocksRaycasts = true; }
+        if (instant) { _canvasRectTransform.localScale = Vector3.one; if (_canvasGroup != null) _canvasGroup.alpha = 1f; return; }
+        _canvasRectTransform.localScale = Vector3.one * 0.85f;
+        if (_canvasGroup != null) _canvasGroup.alpha = 0f;
+        _canvasRectTransform.DOScale(Vector3.one, showDuration).SetEase(showEase);
+        if (_canvasGroup != null) _canvasGroup.DOFade(1f, showDuration);
     }
 
     [Button]
     public virtual void Hide(bool instant = false)
     {
-        if (instant)
-        {
-            _canvasRectTransform.gameObject.SetActive(false);
-        }
-        else
-        {
-            RectTransform rectTransform = _canvasGroup.GetComponent<RectTransform>();
-            rectTransform.DOScale(Vector3.zero, hideDuration).SetEase(hideEase).OnComplete(() =>
-            {
-                _canvasRectTransform.gameObject.SetActive(false);
-            });
-        }
+        if (_canvasRectTransform == null) _canvasRectTransform = transform as RectTransform;
+        if (_canvasRectTransform == null) return;
+        if (_canvasGroup == null) _canvasGroup = _canvasRectTransform.GetComponent<CanvasGroup>();
+        _canvasRectTransform.DOKill();
+        if (_canvasGroup != null) { _canvasGroup.interactable = false; _canvasGroup.blocksRaycasts = false; }
+        if (instant) { _canvasRectTransform.localScale = Vector3.zero; _canvasRectTransform.gameObject.SetActive(false); return; }
+        _canvasRectTransform.DOScale(Vector3.one * 0.85f, hideDuration).SetEase(hideEase).OnComplete(() => _canvasRectTransform.gameObject.SetActive(false));
+        if (_canvasGroup != null) _canvasGroup.DOFade(0f, hideDuration);
     }
 }
