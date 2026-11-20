@@ -50,13 +50,13 @@ public class UiManager : MonoBehaviour
         CreateRuntimeEventWindow("WitchUi", true);
         CreateRuntimeEventWindow("BlacksmithUi", false);
         yield return null;
-        if (GetWindow("StartUi") != null) ShowWindow("StartUi");
+        if (FindWindow("StartUi") != null) ShowWindow("StartUi");
     }
 
     private void CreateRuntimeSettingsWindow()
     {
-        if (GetWindow("SettingsUi") != null) return;
-        UIWindow gameplay = GetWindow("GameplayUi");
+        if (FindWindow("SettingsUi") != null) return;
+        UIWindow gameplay = FindWindow("GameplayUi");
         if (gameplay == null || gameplay.CanvasRectTransform == null) return;
         var go = new GameObject("SettingsUI (runtime)", typeof(RectTransform), typeof(CanvasGroup), typeof(SettingsUi));
         var rect = (RectTransform)go.transform; rect.SetParent(gameplay.CanvasRectTransform, false);
@@ -67,8 +67,8 @@ public class UiManager : MonoBehaviour
 
     private void CreateRuntimeEventWindow(string id, bool witch)
     {
-        if (GetWindow(id) != null) return;
-        UIWindow gameplay = GetWindow("GameplayUi");
+        if (FindWindow(id) != null) return;
+        UIWindow gameplay = FindWindow("GameplayUi");
         if (gameplay == null || gameplay.CanvasRectTransform == null) return;
         var go = new GameObject(id + " (runtime)", typeof(RectTransform), typeof(CanvasGroup), typeof(EventShopUi));
         var rect = (RectTransform)go.transform; rect.SetParent(gameplay.CanvasRectTransform, false);
