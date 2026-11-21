@@ -224,6 +224,7 @@ MonoBehaviour:
   hideEase: 26
   mochilaButton: {fileID: 8372842034322766768}
   habilidadesButton: {fileID: 739692631041823354}
+  settingsIcon: {fileID: 21300000, guid: 4da394c1381fc3e459c1b0c0348cc51b, type: 3}
   Mochila: Mochila
   Habilidades: Habilidades
 --- !u!1 &3232465302461767282
@@ -395,7 +396,7 @@ MonoBehaviour:
   damagePerClick: 1
   ignoreClicksOverButtons: 0
   defeatWindow: Defeat
-  startOnPlay: 1
+  startOnPlay: 0
 --- !u!1 &6327844083024372968
 GameObject:
   m_ObjectHideFlags: 0

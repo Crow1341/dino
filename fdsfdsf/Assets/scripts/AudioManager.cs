@@ -97,7 +97,16 @@ namespace Dino.Utility.Audio
             _soundsContainer.transform.SetParent(transform);
             if (_audioManagerData == null) { Debug.LogError("AudioManagerData is not assigned.", this); return; }
             PrepareLists();
+            AudioListener.volume = Mathf.Clamp01(PlayerPrefs.GetFloat("MasterVolume", 1f));
+            UpdateAudioMixerGroupVolume(PlayerPrefs.GetFloat("MusicVolume", 1f), AudioType.Music);
+            UpdateAudioMixerGroupVolume(PlayerPrefs.GetFloat("SfxVolume", 1f), AudioType.SFX);
             PlaySound("music");
+        }
+
+        private static float SavedChannelVolume(AudioType audioType)
+        {
+            string key = audioType == AudioType.Music ? "MusicVolume" : "SfxVolume";
+            return Mathf.Clamp01(PlayerPrefs.GetFloat(key, 1f));
         }
 
         
@@ -149,7 +158,7 @@ namespace Dino.Utility.Audio
                 audioSource.transform.SetParent(_soundsContainer.transform);
                 audioSource.clip = audioData.clip;
                 audioSource.loop = audioData.loop;
-                audioSource.volume = audioData.volume;
+                audioSource.volume = audioData.volume * SavedChannelVolume(audioData.audioType);
                 audioSource.pitch = audioData.pitch;
                 audioSource.spatialBlend = 0f;
                 SetAudioInMixerGroup(audioSource, audioData.audioType);
@@ -182,21 +191,36 @@ namespace Dino.Utility.Audio
         
         public void UpdateAudioMixerGroupVolume(float value, AudioType audioType)
         {
+            value = Mathf.Clamp01(value);
             float db = Mathf.Clamp(20f * Mathf.Log10(Mathf.Max(0.0001f, value)), -80f, 0f);
             if (_audioManagerData == null) return;
 
+            AudioMixerGroup group = null;
+            string parameter = string.Empty;
             switch (audioType)
             {
                 case AudioType.Music:
-                    if (_audioManagerData.MusicAudioMixerGroup != null) _audioManagerData.MusicAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.MusicVolumeParameterName, db);
+                    group = _audioManagerData.MusicAudioMixerGroup;
+                    parameter = _audioManagerData.MusicVolumeParameterName;
                     break;
                 case AudioType.SFX:
-                    if (_audioManagerData.SfxAudioMixerGroup != null) _audioManagerData.SfxAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.SfxVolumeParameterName, db);
+                    group = _audioManagerData.SfxAudioMixerGroup;
+                    parameter = _audioManagerData.SfxVolumeParameterName;
                     break;
                 case AudioType.Ambience:
-                    if (_audioManagerData.AmbienceAudioMixerGroup != null) _audioManagerData.AmbienceAudioMixerGroup.audioMixer.SetFloat(_audioManagerData.AmbienceVolumeParameterName, db);
+                    group = _audioManagerData.AmbienceAudioMixerGroup;
+                    parameter = _audioManagerData.AmbienceVolumeParameterName;
                     break;
-                
+            }
+
+            if (group != null && group.audioMixer != null && group.audioMixer.SetFloat(parameter, db)) return;
+
+            foreach (AudioData data in _audioManagerData.audioData)
+            {
+                bool isMusic = data.audioType == AudioType.Music;
+                bool controlledChannel = audioType == AudioType.Music ? isMusic : !isMusic;
+                if (controlledChannel && _sourcesByName.TryGetValue(data.name, out AudioSource source) && source != null)
+                    source.volume = data.volume * value;
             }
         }
 

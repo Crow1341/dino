@@ -23,7 +23,7 @@ public class StartUi : UIWindow
         base.Initialize();
 
         if (gameplayButton != null)
-            gameplayButton.onClick.AddListener(() => OpenWindow(gameplayWindow));
+            gameplayButton.onClick.AddListener(StartGameplay);
         else
             Debug.LogWarning("Falta asignar el boton de Gameplay.");
 
@@ -43,7 +43,22 @@ public class StartUi : UIWindow
         if (UiManager.Instance == null) return;
         UiManager.Instance.HideWindow("StartUi");
         UiManager.Instance.ShowWindow("GameplayUi");
+        SettingsUi settings = UiManager.Instance.GetWindow(settingsWindow)?.GetComponent<SettingsUi>();
+        settings?.ConfigureReturnToStart(true);
         UiManager.Instance.ShowWindow(settingsWindow);
+    }
+
+    private void StartGameplay()
+    {
+        StartCoroutine(StartGameplayRoutine());
+    }
+
+    private IEnumerator StartGameplayRoutine()
+    {
+        UiManager.Instance?.HideWindow("StartUi");
+        yield return new WaitForSeconds(delay);
+        UiManager.Instance?.ShowWindow(gameplayWindow);
+        FindFirstObjectByType<GameplayManager>()?.StartGame();
     }
 
     private void OpenWindow(string windowName)

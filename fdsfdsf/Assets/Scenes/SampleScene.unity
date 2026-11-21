@@ -313,6 +313,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &538895302 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+  m_PrefabInstance: {fileID: 782304642}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &607046686 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 79235897267692907, guid: 55d98223fb3e29848a43f7a53c0638e4, type: 3}
@@ -430,6 +435,111 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!1001 &782304642
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2109958789}
+    m_Modifications:
+    - target: {fileID: 3988684771811019385, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3988684771811019385, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3988684771811019385, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3988684771811019385, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3988684771811019385, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3988684771811019385, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4187474791439430707, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_fontAsset
+      value:
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 4187474791439430707, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_sharedMaterial
+      value:
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1105.5221
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1746.2563
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6858750855003618708, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7658474298515945746, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8403172458625044924, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_fontAsset
+      value:
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 8403172458625044924, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_sharedMaterial
+      value:
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 8685070684657894271, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8970156371071437273, guid: 68185882c56706e4da4bd73807c38663, type: 3}
+      propertyPath: m_Name
+      value: SettingsUI
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 68185882c56706e4da4bd73807c38663, type: 3}
 --- !u!114 &824902296 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9050714613354945730, guid: a2669aa182894bb43b2fa6489adc0dfe, type: 3}
@@ -699,6 +809,7 @@ Transform:
   - {fileID: 1061511246}
   - {fileID: 1218823038}
   - {fileID: 1161506026}
+  - {fileID: 538895302}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1184649663097291958
@@ -976,7 +1087,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6476648552092476579, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
       propertyPath: startOnPlay
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6476648552092476579, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
       propertyPath: defeatWindow

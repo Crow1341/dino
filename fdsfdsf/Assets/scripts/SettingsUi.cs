@@ -9,6 +9,9 @@ public class SettingsUi : UIWindow
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private Button backButton;
+    private bool returnToStart;
+
+    public void ConfigureReturnToStart(bool value) { returnToStart = value; }
 
     public override void Initialize()
     {
@@ -17,7 +20,7 @@ public class SettingsUi : UIWindow
         if (masterSlider != null) { Configure(masterSlider, "MasterVolume", 1f); masterSlider.onValueChanged.AddListener(SetMaster); }
         if (musicSlider != null) { Configure(musicSlider, "MusicVolume", 1f); musicSlider.onValueChanged.AddListener(SetMusic); }
         if (sfxSlider != null) { Configure(sfxSlider, "SfxVolume", 1f); sfxSlider.onValueChanged.AddListener(SetSfx); }
-        if (backButton != null) backButton.onClick.AddListener(() => UiManager.Instance?.HideWindow("SettingsUi"));
+        if (backButton != null) backButton.onClick.AddListener(HandleBack);
         if (masterSlider != null) SetMaster(masterSlider.value);
         if (musicSlider != null) SetMusic(musicSlider.value);
         if (sfxSlider != null) SetSfx(sfxSlider.value);
@@ -27,7 +30,10 @@ public class SettingsUi : UIWindow
     {
         RectTransform root = CanvasRectTransform;
         if (root == null) return;
+        foreach (Slider legacySlider in GetComponentsInChildren<Slider>(true)) legacySlider.gameObject.SetActive(false);
+        foreach (Button legacyButton in GetComponentsInChildren<Button>(true)) legacyButton.gameObject.SetActive(false);
         var panel = RuntimeUiFactory.Panel(root, "Audio Settings Panel", new Vector2(650, 510), Vector2.zero);
+        panel.GetComponent<Image>().color = new Color(.025f, .075f, .085f, .84f);
         RuntimeUiFactory.Text(panel, "SETTINGS", new Vector2(0, 195), new Vector2(500, 55), 34);
         masterSlider = RuntimeUiFactory.Slider(panel, "Master volume", 95);
         musicSlider = RuntimeUiFactory.Slider(panel, "Music volume", 0);
@@ -49,6 +55,15 @@ public class SettingsUi : UIWindow
     {
         PlayerPrefs.SetFloat(key, value); PlayerPrefs.Save();
         if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.UpdateAudioMixerGroupVolume(value, type);
+    }
+
+    private void HandleBack()
+    {
+        if (UiManager.Instance == null) return;
+        UiManager.Instance.HideWindow("SettingsUi");
+        if (!returnToStart) return;
+        UiManager.Instance.HideWindow("GameplayUi");
+        UiManager.Instance.ShowWindow("StartUi");
     }
 
     private void Awake() { AudioListener.volume = PlayerPrefs.GetFloat("MasterVolume", 1f); }
