@@ -170,12 +170,18 @@ public class GameplayManager : MonoBehaviour
         int xp = Random.Range(Mathf.Min(xpPerEnemy.x, xpPerEnemy.y), Mathf.Max(xpPerEnemy.x, xpPerEnemy.y) + 1);
         int coins = Random.Range(Mathf.Min(coinsPerEnemy.x, coinsPerEnemy.y), Mathf.Max(coinsPerEnemy.x, coinsPerEnemy.y) + 1);
         int materials = Random.Range(Mathf.Min(materialsPerEnemy.x, materialsPerEnemy.y), Mathf.Max(materialsPerEnemy.x, materialsPerEnemy.y) + 1);
+        xp = Mathf.RoundToInt(xp * progress.XpRewardMultiplier);
+        coins = Mathf.RoundToInt(coins * progress.CoinRewardMultiplier);
+        materials += progress.BonusMaterialsPerEnemy;
         progress.AddRunRewards(xp, coins, materials);
         if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("reward");
         Debug.Log($"Enemy reward: +{xp} XP, +{coins} coins, +{materials} materials");
         float eventRoll = Random.value;
-        if (eventRoll < witchChance) SpecialEventRequested?.Invoke(SpecialEvent.Witch);
-        else if (eventRoll < Mathf.Min(1f, witchChance + blacksmithChance)) SpecialEventRequested?.Invoke(SpecialEvent.Blacksmith);
+        float bonusChance = progress.SpecialEventChanceBonus;
+        float witchThreshold = Mathf.Clamp01(witchChance + bonusChance * .5f);
+        float blacksmithThreshold = Mathf.Clamp01(witchThreshold + blacksmithChance + bonusChance * .5f);
+        if (eventRoll < witchThreshold) SpecialEventRequested?.Invoke(SpecialEvent.Witch);
+        else if (eventRoll < blacksmithThreshold) SpecialEventRequested?.Invoke(SpecialEvent.Blacksmith);
     }
 
     public enum SpecialEvent { Witch, Blacksmith }

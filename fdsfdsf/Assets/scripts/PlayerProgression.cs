@@ -4,6 +4,20 @@ using UnityEngine;
 /// <summary>Permanent profile and temporary run wallet used by combat and shop systems.</summary>
 public sealed class PlayerProgression : MonoBehaviour
 {
+    public const int SkillCount = 8;
+    public const int MaxSkillRank = 3;
+    private const int CurrentSkillSystemVersion = 2;
+    private static readonly string[] SkillNames =
+    {
+        "Golpe afilado", "Hoja pesada", "Concentracion critica", "Cazador experto",
+        "Iman de monedas", "Recolector", "Segundo aliento", "Amuleto de fortuna"
+    };
+    private static readonly string[] SkillDescriptions =
+    {
+        "+1 de dano por rango", "+2 de dano por rango", "+10% de probabilidad critica por rango", "+15% de XP por rango",
+        "+15% de monedas por rango", "+1 material por rango", "El tiempo avanza 8% mas lento por rango", "+3% de probabilidad de evento por rango"
+    };
+
     public static PlayerProgression Instance { get; private set; }
     public event Action Changed;
     public int PermanentXp { get; private set; }
@@ -23,6 +37,11 @@ public sealed class PlayerProgression : MonoBehaviour
     public int TotalXp => PermanentXp + RunXp;
     public int TotalCoins => PermanentCoins + RunCoins;
     public int TotalMaterials => PermanentMaterials + RunMaterials;
+    public float XpRewardMultiplier => 1f + GetSkillLevel(3) * .15f;
+    public float CoinRewardMultiplier => 1f + GetSkillLevel(4) * .15f;
+    public int BonusMaterialsPerEnemy => GetSkillLevel(5);
+    public float TimerDrainMultiplier => Mathf.Max(.2f, 1f - GetSkillLevel(6) * .08f);
+    public float SpecialEventChanceBonus => GetSkillLevel(7) * .03f;
 
     public static PlayerProgression EnsureInstance()
     {
@@ -79,11 +98,14 @@ public sealed class PlayerProgression : MonoBehaviour
     public void AddPotion() { Potions++; Save(); Changed?.Invoke(); }
     public bool UsePotion() { if (Potions <= 0) return false; Potions--; Save(); Changed?.Invoke(); return true; }
 
-    public int GetSkillLevel(int skill) => PlayerPrefs.GetInt("Skill." + skill, 0);
-    public int GetSkillCost(int skill) => 20 * (GetSkillLevel(skill) + 1) * (skill + 1);
+    public static string GetSkillName(int skill) => IsValidSkill(skill) ? SkillNames[skill] : string.Empty;
+    public static string GetSkillDescription(int skill) => IsValidSkill(skill) ? SkillDescriptions[skill] : string.Empty;
+
+    public int GetSkillLevel(int skill) => IsValidSkill(skill) ? PlayerPrefs.GetInt("Skill." + skill, 0) : 0;
+    public int GetSkillCost(int skill) => IsValidSkill(skill) ? 20 * (GetSkillLevel(skill) + 1) * (skill + 1) : 0;
     public bool UpgradeSkill(int skill)
     {
-        if (skill < 0 || skill > 2 || GetSkillLevel(skill) >= 3) return false;
+        if (!IsValidSkill(skill) || GetSkillLevel(skill) >= MaxSkillRank) return false;
         int cost = GetSkillCost(skill);
         if (!SpendXp(cost)) return false;
         PlayerPrefs.SetInt("Skill." + skill, GetSkillLevel(skill) + 1); PlayerPrefs.Save(); Changed?.Invoke(); return true;
@@ -130,5 +152,25 @@ public sealed class PlayerProgression : MonoBehaviour
         IsRunActive = PlayerPrefs.GetInt("Run.Active", 0) == 1; RunEnemyKills = PlayerPrefs.GetInt("Run.Kills", 0);
         SavedEnemyHealth = PlayerPrefs.GetFloat("Run.EnemyHealth", 0); SavedTimeRemaining = PlayerPrefs.GetFloat("Run.Time", 300f);
         SavedSpriteIndex = PlayerPrefs.GetInt("Run.Sprite", -1);
+        MigrateSkillData();
+    }
+
+    private static bool IsValidSkill(int skill) => skill >= 0 && skill < SkillCount;
+
+    private static void MigrateSkillData()
+    {
+        int savedVersion = PlayerPrefs.GetInt("Skill.SystemVersion", 0);
+        if (savedVersion >= CurrentSkillSystemVersion)
+            return;
+
+        for (int skill = 0; skill < SkillCount; skill++)
+        {
+            string key = "Skill." + skill;
+            if (PlayerPrefs.HasKey(key))
+                PlayerPrefs.SetInt(key, Mathf.Clamp(PlayerPrefs.GetInt(key), 0, MaxSkillRank));
+        }
+
+        PlayerPrefs.SetInt("Skill.SystemVersion", CurrentSkillSystemVersion);
+        PlayerPrefs.Save();
     }
 }

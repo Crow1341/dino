@@ -62,7 +62,8 @@ public class TimeController : MonoBehaviour
         if (!timerRunning)
             return;
 
-        currentTime -= Time.deltaTime;
+        float timeMultiplier = PlayerProgression.Instance != null ? PlayerProgression.Instance.TimerDrainMultiplier : 1f;
+        currentTime -= Time.deltaTime * timeMultiplier;
         int wholeSecond = Mathf.CeilToInt(currentTime);
         if (wholeSecond != lastSavedSecond)
         {
