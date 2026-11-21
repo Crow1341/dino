@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,8 +11,9 @@ public class PopUi : UIWindow
         GameplayManager gameplay = FindAnyObjectByType<GameplayManager>();
         foreach (var button in buttons)
         {
-            string buttonName = button.name.ToLowerInvariant();
-            if (buttonName.Contains("(1)") || buttonName.Contains("menu"))
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
+            string labelText = label != null ? label.text.Trim().ToLowerInvariant() : button.name.ToLowerInvariant();
+            if (labelText.Contains("menu"))
                 button.onClick.AddListener(ReturnToMenu);
             else
                 button.onClick.AddListener(() => gameplay?.RestartGame());
