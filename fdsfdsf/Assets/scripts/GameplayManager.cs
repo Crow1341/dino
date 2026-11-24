@@ -32,9 +32,12 @@ public class GameplayManager : MonoBehaviour
 
     private bool gameEnded = true;
     private bool defeatShown;
+    private int monstersDefeated;
     private float potionBonus;
     private Coroutine potionRoutine;
     private readonly List<RaycastResult> raycastResults = new List<RaycastResult>();
+
+    public event System.Action<int> MonstersDefeatedChanged;
 
     // Se ejecuta cada vez que la UI de Gamplay se activa
     private void OnEnable()
@@ -79,22 +82,29 @@ public class GameplayManager : MonoBehaviour
         if (progress.IsRunActive)
         {
             monster.RestoreRun(progress.RunEnemyKills, progress.SavedEnemyHealth, progress.SavedSpriteIndex);
+            SetMonstersDefeated(monster.KillCount);
             timer.StartTimer(progress.SavedTimeRemaining);
         }
         else
         {
-            progress.BeginNewRun(); monster.ResetMonster(); timer.StartTimer();
+            progress.BeginNewRun();
+            monster.ResetMonster();
+            SetMonstersDefeated(0);
+            timer.StartTimer();
         }
     }
 
     public void MonsterDefeated()
     {
-        if (gameEnded)
+        // MosnterController only notifies after reaching zero health. This guard also
+        // makes a delayed or duplicated animation callback harmless.
+        if (gameEnded || monster == null || monster.CurrentHealth > 0f)
             return;
 
         GrantEnemyRewards();
         if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("enemy_defeated");
         monster.NextMonster();
+        SetMonstersDefeated(monster.KillCount);
         timer.StartTimer();
         if (PlayerProgression.Instance != null) PlayerProgression.Instance.SaveRunSnapshot(timer.RemainingTime, monster.KillCount, monster.CurrentHealth, monster.CurrentSpriteIndex);
 
@@ -125,8 +135,19 @@ public class GameplayManager : MonoBehaviour
 
     public bool IsRunning => !gameEnded;
     public float DamagePerClick => damagePerClick;
+    public int MonstersDefeated => monstersDefeated;
     public float RemainingTime => timer != null ? timer.RemainingTime : 0f;
     public MosnterController GetMonster() => monster;
+
+    private void SetMonstersDefeated(int value)
+    {
+        value = Mathf.Max(0, value);
+        if (monstersDefeated == value)
+            return;
+
+        monstersDefeated = value;
+        MonstersDefeatedChanged?.Invoke(monstersDefeated);
+    }
 
     public void UseDamagePotion()
     {

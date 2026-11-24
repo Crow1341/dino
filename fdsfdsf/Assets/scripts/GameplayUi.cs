@@ -13,6 +13,7 @@ public class GameplayUi : UIWindow
     private Button retreatButton;
     private GameplayManager manager;
     private RectTransform hudRoot;
+    private TMP_Text defeatedMonstersText;
 
     public RectTransform EnsureHudRoot()
     {
@@ -50,6 +51,12 @@ public class GameplayUi : UIWindow
 
         manager = FindFirstObjectByType<GameplayManager>();
         CreateShortcuts();
+        CreateDefeatedMonstersCounter();
+        if (manager != null)
+        {
+            manager.MonstersDefeatedChanged += RefreshDefeatedMonstersCounter;
+            RefreshDefeatedMonstersCounter(manager.MonstersDefeated);
+        }
     }
 
     private void CreateShortcuts()
@@ -87,6 +94,34 @@ public class GameplayUi : UIWindow
         rect.anchorMax = Vector2.one;
         rect.pivot = Vector2.one;
         rect.anchoredPosition = position;
+    }
+
+    private void CreateDefeatedMonstersCounter()
+    {
+        RectTransform root = EnsureHudRoot();
+        if (root == null || defeatedMonstersText != null)
+            return;
+
+        defeatedMonstersText = RuntimeUiFactory.Text(root, "Monstruos derrotados: 0", Vector2.zero, new Vector2(420f, 38f), 22);
+        defeatedMonstersText.name = "Defeated Monsters Counter";
+        defeatedMonstersText.fontStyle = FontStyles.Bold;
+        defeatedMonstersText.raycastTarget = false;
+        defeatedMonstersText.rectTransform.anchorMin = new Vector2(.5f, 1f);
+        defeatedMonstersText.rectTransform.anchorMax = new Vector2(.5f, 1f);
+        defeatedMonstersText.rectTransform.pivot = new Vector2(.5f, 1f);
+        defeatedMonstersText.rectTransform.anchoredPosition = new Vector2(0f, -88f);
+    }
+
+    private void RefreshDefeatedMonstersCounter(int defeatedMonsters)
+    {
+        if (defeatedMonstersText != null)
+            defeatedMonstersText.text = $"Monstruos derrotados: {defeatedMonsters}";
+    }
+
+    private void OnDestroy()
+    {
+        if (manager != null)
+            manager.MonstersDefeatedChanged -= RefreshDefeatedMonstersCounter;
     }
 
     private void Update()
