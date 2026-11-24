@@ -26,7 +26,8 @@ public class TimeController : MonoBehaviour
         gameplayManager = FindAnyObjectByType<GameplayManager>();
         if (timerText == null)
         {
-            var parent = transform.parent as RectTransform;
+            GameplayUi gameplayUi = FindAnyObjectByType<GameplayUi>();
+            RectTransform parent = gameplayUi != null ? gameplayUi.EnsureHudRoot() : null;
             if (parent == null)
             {
                 var canvas = FindAnyObjectByType<Canvas>();
@@ -34,10 +35,12 @@ public class TimeController : MonoBehaviour
             }
             if (parent != null)
             {
-                timerText = RuntimeUiFactory.Text(parent, "05:00", new Vector2(0, -40), new Vector2(240, 70), 38);
+                timerText = RuntimeUiFactory.Text(parent, "05:00", Vector2.zero, new Vector2(300, 62), 40);
                 timerText.name = "Run Timer Text"; timerText.fontStyle = TMPro.FontStyles.Bold;
                 timerText.rectTransform.anchorMin = timerText.rectTransform.anchorMax = new Vector2(.5f, 1f);
                 timerText.rectTransform.pivot = new Vector2(.5f, 1f);
+                timerText.rectTransform.anchoredPosition = new Vector2(0f, -26f);
+                timerText.raycastTarget = false;
             }
         }
         currentTime = timeLimit;
@@ -62,8 +65,7 @@ public class TimeController : MonoBehaviour
         if (!timerRunning)
             return;
 
-        float timeMultiplier = PlayerProgression.Instance != null ? PlayerProgression.Instance.TimerDrainMultiplier : 1f;
-        currentTime -= Time.deltaTime * timeMultiplier;
+        currentTime -= Time.deltaTime;
         int wholeSecond = Mathf.CeilToInt(currentTime);
         if (wholeSecond != lastSavedSecond)
         {
