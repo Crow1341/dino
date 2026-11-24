@@ -8,13 +8,6 @@ public class UiManager : MonoBehaviour
    public static UiManager Instance {get; private set;}
 
     [SerializeField] private List<UIWindow> _uiWindows;
-    [Header("Special event economy")]
-    [SerializeField, Min(1)] private int potionPrice = 5;
-    [SerializeField, Min(1)] private int steelSwordMaterials = 3;
-    [SerializeField, Min(1)] private int enchantedSwordMaterials = 8;
-    [Header("Special event artwork")]
-    [SerializeField] private Sprite witchFrame;
-    [SerializeField] private Sprite blacksmithFrame;
     public List<UIWindow> UIWindows => _uiWindows;
 
     private void Awake()
@@ -34,9 +27,15 @@ public class UiManager : MonoBehaviour
     private System.Collections.IEnumerator Start()
     {
         if (_uiWindows == null) _uiWindows = new List<UIWindow>();
+        _uiWindows.RemoveAll(IsRetiredGameplayWindow);
         foreach (var discovered in FindObjectsByType<UIWindow>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             if (discovered == null) continue;
+            if (IsRetiredGameplayWindow(discovered))
+            {
+                discovered.gameObject.SetActive(false);
+                continue;
+            }
             if (string.IsNullOrEmpty(discovered.Id))
                 discovered.ConfigureIdentity(discovered is PopUi ? "PopUi" : discovered.GetType().Name, discovered.CanvasRectTransform != null ? discovered.CanvasRectTransform : discovered.transform as RectTransform);
             if (!_uiWindows.Contains(discovered)) _uiWindows.Add(discovered);
@@ -54,8 +53,6 @@ public class UiManager : MonoBehaviour
             button.colors = colors;
         }
         CreateRuntimeSettingsWindow();
-        CreateRuntimeEventWindow("WitchUi", true);
-        CreateRuntimeEventWindow("BlacksmithUi", false);
         yield return null;
         if (FindWindow("StartUi") != null) ShowWindow("StartUi");
     }
@@ -70,20 +67,6 @@ public class UiManager : MonoBehaviour
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = rect.offsetMax = Vector2.zero;
         var settings = go.GetComponent<SettingsUi>(); settings.ConfigureIdentity("SettingsUi", rect);
         _uiWindows.Add(settings); settings.Hide(true);
-    }
-
-    private void CreateRuntimeEventWindow(string id, bool witch)
-    {
-        if (FindWindow(id) != null) return;
-        UIWindow gameplay = FindWindow("GameplayUi");
-        if (gameplay == null || gameplay.CanvasRectTransform == null) return;
-        var go = new GameObject(id + " (runtime)", typeof(RectTransform), typeof(CanvasGroup), typeof(EventShopUi));
-        var rect = (RectTransform)go.transform; rect.SetParent(gameplay.CanvasRectTransform, false);
-        rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = rect.offsetMax = Vector2.zero;
-        var shop = go.GetComponent<EventShopUi>();
-        shop.ConfigureIdentity(id, rect);
-        shop.Configure(witch, potionPrice, steelSwordMaterials, enchantedSwordMaterials, witch ? witchFrame : blacksmithFrame);
-        _uiWindows.Add(shop); shop.Hide(true);
     }
 
     public void ShowWindow(string windowName)
@@ -130,8 +113,11 @@ public class UiManager : MonoBehaviour
 
     private static bool AliasMatches(string requested, string id)
     {
-        return (requested == "mochila" || requested == "backpackui" || requested == "backpakcui") && id == "backpakcui"
-            || (requested == "habilidades" || requested == "habilitiesui") && id == "gabilitiesui"
-            || (requested == "derrota" || requested == "defeat" || requested == "popui") && id == "popui";
+        return (requested == "derrota" || requested == "defeat" || requested == "popui") && id == "popui";
+    }
+
+    private static bool IsRetiredGameplayWindow(UIWindow window)
+    {
+        return window is BackpackUi || window is GabilitiesUi;
     }
 }

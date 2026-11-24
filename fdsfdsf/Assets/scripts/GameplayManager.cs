@@ -29,8 +29,6 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] private Vector2Int xpPerEnemy = new Vector2Int(5, 10);
     [SerializeField] private Vector2Int coinsPerEnemy = new Vector2Int(2, 6);
     [SerializeField] private Vector2Int materialsPerEnemy = new Vector2Int(0, 2);
-    [SerializeField, Range(0f, 1f)] private float witchChance = 0.05f;
-    [SerializeField, Range(0f, 1f)] private float blacksmithChance = 0.05f;
 
     private bool gameEnded = true;
     private bool defeatShown;
@@ -41,7 +39,6 @@ public class GameplayManager : MonoBehaviour
     // Se ejecuta cada vez que la UI de Gamplay se activa
     private void OnEnable()
     {
-        SpecialEventRequested += HandleSpecialEvent;
         ignoreClicksOverButtons = true;
         if (startOnPlay)
             StartGame();
@@ -50,7 +47,6 @@ public class GameplayManager : MonoBehaviour
     // Al desactivarse la UI, la partida se pausa
     private void OnDisable()
     {
-        SpecialEventRequested -= HandleSpecialEvent;
         gameEnded = true;
 
         if (timer != null)
@@ -176,22 +172,6 @@ public class GameplayManager : MonoBehaviour
         progress.AddRunRewards(xp, coins, materials);
         if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("reward");
         Debug.Log($"Enemy reward: +{xp} XP, +{coins} coins, +{materials} materials");
-        float eventRoll = Random.value;
-        float bonusChance = progress.SpecialEventChanceBonus;
-        float witchThreshold = Mathf.Clamp01(witchChance + bonusChance * .5f);
-        float blacksmithThreshold = Mathf.Clamp01(witchThreshold + blacksmithChance + bonusChance * .5f);
-        if (eventRoll < witchThreshold) SpecialEventRequested?.Invoke(SpecialEvent.Witch);
-        else if (eventRoll < blacksmithThreshold) SpecialEventRequested?.Invoke(SpecialEvent.Blacksmith);
-    }
-
-    public enum SpecialEvent { Witch, Blacksmith }
-    public event System.Action<SpecialEvent> SpecialEventRequested;
-
-    private void HandleSpecialEvent(SpecialEvent specialEvent)
-    {
-        if (Dino.Utility.Audio.AudioManager.Instance != null) Dino.Utility.Audio.AudioManager.Instance.PlaySound("event");
-        if (UiManager.Instance == null) return;
-        UiManager.Instance.ShowWindow(specialEvent == SpecialEvent.Witch ? "WitchUi" : "BlacksmithUi");
     }
 
     private bool ClickedThisFrame()

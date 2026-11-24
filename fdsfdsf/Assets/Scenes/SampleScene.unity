@@ -788,8 +788,6 @@ MonoBehaviour:
   - {fileID: 2359620296469779115}
   - {fileID: 7687789495941390155}
   - {fileID: 1658737081641734668}
-  - {fileID: 2341716503122161594}
-  - {fileID: 1184649663097291959}
 --- !u!4 &2109958789
 Transform:
   m_ObjectHideFlags: 0
@@ -898,7 +896,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5042157334554623190, guid: 12fd202e59590a34d951a80c84442caf, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8163280736732240841, guid: 12fd202e59590a34d951a80c84442caf, type: 3}
       propertyPath: m_IsActive
@@ -962,14 +960,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1305251218725457429, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
-      propertyPath: Mochila
-      value: BackpakcUi
-      objectReference: {fileID: 0}
-    - target: {fileID: 1305251218725457429, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
-      propertyPath: Habilidades
-      value: HabilitiesUi
-      objectReference: {fileID: 0}
-    - target: {fileID: 1305251218725457429, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
       propertyPath: _canvasGroup
       value: 
       objectReference: {fileID: 1658737081641734669}
@@ -977,14 +967,6 @@ PrefabInstance:
       propertyPath: _hideOnStart
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1305251218725457429, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
-      propertyPath: mochilaButton
-      value: 
-      objectReference: {fileID: 1387086639}
-    - target: {fileID: 1305251218725457429, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
-      propertyPath: habilidadesButton
-      value: 
-      objectReference: {fileID: 331247381}
     - target: {fileID: 1370266930022791891, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
       propertyPath: m_fontSize
       value: 30.4
@@ -1063,7 +1045,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3232465302461767282, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3245711234139118488, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
       propertyPath: m_IsActive
@@ -1079,7 +1061,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6327844083024372968, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6433558805911057029, guid: 4f55504ffc0a10d47b8fc98e5a17cd9a, type: 3}
       propertyPath: m_IsActive
@@ -1244,7 +1226,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5434715444298745792, guid: a2669aa182894bb43b2fa6489adc0dfe, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8203271905733531842, guid: a2669aa182894bb43b2fa6489adc0dfe, type: 3}
       propertyPath: m_IsActive
