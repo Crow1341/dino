@@ -16,6 +16,7 @@ public class TimeController : MonoBehaviour
 
     private float currentTime;
     private bool timerRunning = false;
+    private bool timerPaused;
 
     private GameplayManager gameplayManager;
     public float RemainingTime => currentTime;
@@ -56,13 +57,14 @@ public class TimeController : MonoBehaviour
     {
         currentTime = Mathf.Clamp(seconds, 0f, timeLimit);
         timerRunning = true;
+        timerPaused = false;
         lastSavedSecond = -1;
         RefreshUI();
     }
 
     private void Update()
     {
-        if (!timerRunning)
+        if (!timerRunning || timerPaused)
             return;
 
         currentTime -= Time.deltaTime;
@@ -90,6 +92,19 @@ public class TimeController : MonoBehaviour
     public void StopTimer()
     {
         timerRunning = false;
+        timerPaused = false;
+    }
+
+    public void PauseTimer()
+    {
+        if (timerRunning)
+            timerPaused = true;
+    }
+
+    public void ResumeTimer()
+    {
+        if (timerRunning)
+            timerPaused = false;
     }
 
     private void RefreshUI()
