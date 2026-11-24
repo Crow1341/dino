@@ -31,6 +31,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] private Vector2Int materialsPerEnemy = new Vector2Int(0, 2);
 
     private bool gameEnded = true;
+    private bool gamePaused;
     private bool defeatShown;
     private int monstersDefeated;
     private float potionBonus;
@@ -58,7 +59,7 @@ public class GameplayManager : MonoBehaviour
 
     private void Update()
     {
-        if (gameEnded)
+        if (gameEnded || gamePaused)
             return;
 
         if (ClickedThisFrame() && monster != null)
@@ -78,6 +79,7 @@ public class GameplayManager : MonoBehaviour
         if (monster == null || timer == null) { Debug.LogError("GameplayManager requires Monster and Timer references.", this); return; }
         PlayerProgression progress = PlayerProgression.EnsureInstance();
         gameEnded = false;
+        gamePaused = false;
         defeatShown = false;
         if (progress.IsRunActive)
         {
@@ -134,10 +136,48 @@ public class GameplayManager : MonoBehaviour
     }
 
     public bool IsRunning => !gameEnded;
+    public bool IsPaused => gamePaused;
     public float DamagePerClick => damagePerClick;
     public int MonstersDefeated => monstersDefeated;
     public float RemainingTime => timer != null ? timer.RemainingTime : 0f;
     public MosnterController GetMonster() => monster;
+
+    public void PauseGameplay()
+    {
+        if (gameEnded || gamePaused)
+            return;
+
+        gamePaused = true;
+        if (timer != null)
+            timer.PauseTimer();
+    }
+
+    public void ResumeGameplay()
+    {
+        if (gameEnded || !gamePaused)
+            return;
+
+        gamePaused = false;
+        if (timer != null)
+            timer.ResumeTimer();
+    }
+
+    public void ReturnToMainMenu()
+    {
+        if (gameEnded)
+            return;
+
+        gamePaused = true;
+        SaveCurrentRunSnapshot();
+        if (timer != null)
+            timer.StopTimer();
+
+        if (UiManager.Instance != null)
+        {
+            UiManager.Instance.HideWindow("GameplayUi");
+            UiManager.Instance.ShowWindow("StartUi");
+        }
+    }
 
     private void SetMonstersDefeated(int value)
     {
@@ -171,6 +211,14 @@ public class GameplayManager : MonoBehaviour
         if (PlayerProgression.Instance != null) PlayerProgression.Instance.RetireRun();
         if (UiManager.Instance != null) UiManager.Instance.HideWindow("GameplayUi");
         if (UiManager.Instance != null) UiManager.Instance.ShowWindow("StartUi");
+    }
+
+    private void SaveCurrentRunSnapshot()
+    {
+        if (PlayerProgression.Instance == null || monster == null || timer == null)
+            return;
+
+        PlayerProgression.Instance.SaveRunSnapshot(timer.RemainingTime, monster.KillCount, monster.CurrentHealth, monster.CurrentSpriteIndex);
     }
 
     public void RestartGame()

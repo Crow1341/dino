@@ -5,13 +5,16 @@ using UnityEngine.UI;
 /// <summary>Audio settings kept in PlayerPrefs and applied immediately.</summary>
 public class SettingsUi : UIWindow
 {
+    private enum BackDestination { Gameplay, StartMenu, PauseMenu }
+
     [SerializeField] private Slider masterSlider;
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private Button backButton;
-    private bool returnToStart;
+    private BackDestination backDestination;
 
-    public void ConfigureReturnToStart(bool value) { returnToStart = value; }
+    public void ConfigureReturnToStart(bool value) { backDestination = value ? BackDestination.StartMenu : BackDestination.Gameplay; }
+    public void ConfigureReturnToPauseMenu() { backDestination = BackDestination.PauseMenu; }
 
     public override void Initialize()
     {
@@ -61,9 +64,15 @@ public class SettingsUi : UIWindow
     {
         if (UiManager.Instance == null) return;
         UiManager.Instance.HideWindow("SettingsUi");
-        if (!returnToStart) return;
-        UiManager.Instance.HideWindow("GameplayUi");
-        UiManager.Instance.ShowWindow("StartUi");
+        if (backDestination == BackDestination.StartMenu)
+        {
+            UiManager.Instance.HideWindow("GameplayUi");
+            UiManager.Instance.ShowWindow("StartUi");
+        }
+        else if (backDestination == BackDestination.PauseMenu)
+        {
+            FindAnyObjectByType<GameplayUi>()?.ReturnToPauseMenu();
+        }
     }
 
     private void Awake() { AudioListener.volume = PlayerPrefs.GetFloat("MasterVolume", 1f); }

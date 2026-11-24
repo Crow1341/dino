@@ -2,6 +2,7 @@ using UnityEngine;
 using NaughtyAttributes;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 using System.Collections.Generic;
 using System.Collections;
 
@@ -14,6 +15,8 @@ public class GameplayUi : UIWindow
     private GameplayManager manager;
     private RectTransform hudRoot;
     private TMP_Text defeatedMonstersText;
+    private RectTransform pauseMenu;
+    private CanvasGroup pauseMenuGroup;
 
     public RectTransform EnsureHudRoot()
     {
@@ -31,7 +34,7 @@ public class GameplayUi : UIWindow
             return hudRoot;
         }
 
-        var hudObject = new GameObject("Gameplay HUD", typeof(RectTransform), typeof(Canvas));
+        var hudObject = new GameObject("Gameplay HUD", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
         hudObject.transform.SetParent(root, false);
         hudRoot = (RectTransform)hudObject.transform;
         hudRoot.anchorMin = Vector2.zero;
@@ -52,6 +55,7 @@ public class GameplayUi : UIWindow
         manager = FindFirstObjectByType<GameplayManager>();
         CreateShortcuts();
         CreateDefeatedMonstersCounter();
+        CreatePauseMenu();
         if (manager != null)
         {
             manager.MonstersDefeatedChanged += RefreshDefeatedMonstersCounter;
@@ -80,7 +84,7 @@ public class GameplayUi : UIWindow
             iconImage.preserveAspect = true;
             iconImage.raycastTarget = false;
         }
-        TMP_Text settingsLabel = RuntimeUiFactory.Text(root, "AJUSTES", Vector2.zero, new Vector2(96, 22), 13);
+        TMP_Text settingsLabel = RuntimeUiFactory.Text(root, "PAUSA", Vector2.zero, new Vector2(96, 22), 13);
         settingsLabel.raycastTarget = false;
         PlaceAtTopRight(settingsLabel.rectTransform, new Vector2(-32f, -88f));
         retreatButton = RuntimeUiFactory.Button(root, "RETIRARSE", Vector2.zero, new Vector2(150, 52), () => manager?.Retreat());
@@ -118,6 +122,110 @@ public class GameplayUi : UIWindow
             defeatedMonstersText.text = $"Monstruos derrotados: {defeatedMonsters}";
     }
 
+    private void CreatePauseMenu()
+    {
+        RectTransform root = EnsureHudRoot();
+        if (root == null || pauseMenu != null)
+            return;
+
+        pauseMenu = RuntimeUiFactory.Panel(root, "Gameplay Pause Menu", new Vector2(430f, 380f), Vector2.zero);
+        pauseMenu.GetComponent<Image>().color = new Color(.025f, .075f, .085f, .96f);
+        pauseMenuGroup = pauseMenu.gameObject.AddComponent<CanvasGroup>();
+        RuntimeUiFactory.Text(pauseMenu, "PAUSA", new Vector2(0f, 125f), new Vector2(350f, 52f), 34).raycastTarget = false;
+        RuntimeUiFactory.Text(pauseMenu, "La partida está detenida", new Vector2(0f, 75f), new Vector2(350f, 28f), 17).raycastTarget = false;
+        RuntimeUiFactory.Button(pauseMenu, "SETTINGS", new Vector2(0f, 15f), new Vector2(285f, 54f), OpenSettingsFromPause);
+        RuntimeUiFactory.Button(pauseMenu, "VOLVER AL MENÚ", new Vector2(0f, -52f), new Vector2(285f, 54f), ReturnToMainMenu);
+        RuntimeUiFactory.Button(pauseMenu, "CONTINUAR", new Vector2(0f, -119f), new Vector2(285f, 54f), ResumeGameplay);
+        pauseMenu.gameObject.SetActive(false);
+    }
+
+    private void OpenPauseMenu()
+    {
+        if (manager == null || !manager.IsRunning)
+            return;
+
+        manager.PauseGameplay();
+        ShowPauseMenu();
+    }
+
+    public void ReturnToPauseMenu()
+    {
+        if (manager == null || !manager.IsRunning)
+            return;
+
+        if (settingsShortcut != null)
+            settingsShortcut.interactable = true;
+        manager.PauseGameplay();
+        ShowPauseMenu();
+    }
+
+    private void ShowPauseMenu()
+    {
+        if (pauseMenu == null)
+            CreatePauseMenu();
+        if (pauseMenu == null || pauseMenuGroup == null)
+            return;
+
+        pauseMenu.DOKill();
+        pauseMenuGroup.DOKill();
+        pauseMenu.gameObject.SetActive(true);
+        pauseMenuGroup.alpha = 0f;
+        pauseMenuGroup.interactable = true;
+        pauseMenuGroup.blocksRaycasts = true;
+        pauseMenu.localScale = Vector3.one * .88f;
+        pauseMenu.DOScale(Vector3.one, .18f).SetEase(Ease.OutBack);
+        pauseMenuGroup.DOFade(1f, .16f);
+    }
+
+    private void HidePauseMenu(bool instant)
+    {
+        if (pauseMenu == null || !pauseMenu.gameObject.activeSelf)
+            return;
+
+        pauseMenu.DOKill();
+        pauseMenuGroup.DOKill();
+        pauseMenuGroup.interactable = false;
+        pauseMenuGroup.blocksRaycasts = false;
+        if (instant)
+        {
+            pauseMenu.gameObject.SetActive(false);
+            return;
+        }
+
+        pauseMenu.DOScale(Vector3.one * .88f, .14f).SetEase(Ease.InBack).OnComplete(() => pauseMenu.gameObject.SetActive(false));
+        pauseMenuGroup.DOFade(0f, .14f);
+    }
+
+    private void ResumeGameplay()
+    {
+        HidePauseMenu(false);
+        if (settingsShortcut != null)
+            settingsShortcut.interactable = true;
+        manager?.ResumeGameplay();
+    }
+
+    private void OpenSettingsFromPause()
+    {
+        if (UiManager.Instance == null)
+            return;
+
+        SettingsUi settings = UiManager.Instance.GetWindow("SettingsUi")?.GetComponent<SettingsUi>();
+        if (settings == null)
+            return;
+
+        settings.ConfigureReturnToPauseMenu();
+        if (settingsShortcut != null)
+            settingsShortcut.interactable = false;
+        HidePauseMenu(true);
+        UiManager.Instance.ShowWindow("SettingsUi");
+    }
+
+    private void ReturnToMainMenu()
+    {
+        HidePauseMenu(true);
+        manager?.ReturnToMainMenu();
+    }
+
     private void OnDestroy()
     {
         if (manager != null)
@@ -130,12 +238,7 @@ public class GameplayUi : UIWindow
             retreatButton.gameObject.SetActive(manager.IsRunning && manager.RemainingTime <= 30f && manager.RemainingTime > 0f);
     }
 
-    private void OpenSettings()
-    {
-        SettingsUi settings = UiManager.Instance != null ? UiManager.Instance.GetWindow("SettingsUi")?.GetComponent<SettingsUi>() : null;
-        settings?.ConfigureReturnToStart(false);
-        UiManager.Instance?.ShowWindow("SettingsUi");
-    }
+    private void OpenSettings() => OpenPauseMenu();
 
 
 }
