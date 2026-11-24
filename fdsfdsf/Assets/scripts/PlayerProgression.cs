@@ -34,6 +34,8 @@ public sealed class PlayerProgression : MonoBehaviour
     public int SavedSpriteIndex { get; private set; }
     public int EquippedSword { get; private set; }
     public float SwordDamage => EquippedSword == 1 ? 3f : EquippedSword == 2 ? 8f : 0f;
+    public string EquippedSwordName => EquippedSword == 1 ? "Espada de acero" : EquippedSword == 2 ? "Espada encantada" : "Espada inicial";
+    public string OwnedSwordSummary => "Inicial" + (HasSword(1) ? ", Acero" : string.Empty) + (HasSword(2) ? ", Encantada" : string.Empty);
     public int TotalXp => PermanentXp + RunXp;
     public int TotalCoins => PermanentCoins + RunCoins;
     public int TotalMaterials => PermanentMaterials + RunMaterials;

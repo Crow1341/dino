@@ -8,6 +8,13 @@ public class UiManager : MonoBehaviour
    public static UiManager Instance {get; private set;}
 
     [SerializeField] private List<UIWindow> _uiWindows;
+    [Header("Special event economy")]
+    [SerializeField, Min(1)] private int potionPrice = 5;
+    [SerializeField, Min(1)] private int steelSwordMaterials = 3;
+    [SerializeField, Min(1)] private int enchantedSwordMaterials = 8;
+    [Header("Special event artwork")]
+    [SerializeField] private Sprite witchFrame;
+    [SerializeField] private Sprite blacksmithFrame;
     public List<UIWindow> UIWindows => _uiWindows;
 
     private void Awake()
@@ -73,7 +80,9 @@ public class UiManager : MonoBehaviour
         var go = new GameObject(id + " (runtime)", typeof(RectTransform), typeof(CanvasGroup), typeof(EventShopUi));
         var rect = (RectTransform)go.transform; rect.SetParent(gameplay.CanvasRectTransform, false);
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = rect.offsetMax = Vector2.zero;
-        var shop = go.GetComponent<EventShopUi>(); shop.ConfigureIdentity(id, rect); shop.SetWitch(witch);
+        var shop = go.GetComponent<EventShopUi>();
+        shop.ConfigureIdentity(id, rect);
+        shop.Configure(witch, potionPrice, steelSwordMaterials, enchantedSwordMaterials, witch ? witchFrame : blacksmithFrame);
         _uiWindows.Add(shop); shop.Hide(true);
     }
 
